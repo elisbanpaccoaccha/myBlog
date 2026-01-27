@@ -1,0 +1,248 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Note - Navidad"
+    description="Navidad es un festival religioso que se celebra el 25 de diciembre en honor a la nacimiento de Jesús de Nazaret."
+>
+    <section class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+        <div class="@container mt-8">
+            <div class="@[480px]:p-4">
+                <div
+                    class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-center justify-center p-4"
+                    data-alt="Abstract image of blurred festive lights in red, green, and gold"
+                    style='background-image: linear-gradient(rgba(34, 16, 17, 0.6) 0%, rgba(34, 16, 17, 0.9) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_SKEkSyRk6kDQmSsYFECFBDZh-MJxASSDV5PMc7GWPAwDj0UackidwQF8wfMdQVT0o9gTmK60pnL3kT_5fBDsmfXhGXfLEfIS7bLqI8aFo5aejfJOLNZ9F-KkCJsUYXdXS7dTBOdPVX_nemFOtFS5peZwZCRl2NYxm_7wnRvhRkj9D_AWSVNa46suDxorvv91xoCw-JsChCug3yM7M8SBW58niQP96NtXjBQpUHFB9GQIKCGknMoHrZrzoRbzzHa3ln8f1xkDfac");'
+                >
+                    <div class="flex flex-col gap-2 text-center max-w-2xl">
+                        <h1
+                            class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                        >
+                            A Very Merry Christmas
+                        </h1>
+                        <h2
+                            class="text-white/80 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal"
+                        >
+                            Welcome to our festive corner of the blog. Discover
+                            heartwarming stories, delicious recipes, and
+                            thoughtful gift ideas to make your holiday season
+                            truly special.
+                        </h2>
+                    </div>
+                    <button
+                        class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em] hover:bg-primary/90 transition-colors"
+                    >
+                        <span class="truncate">Explore Holiday Posts</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <h2
+            class="dark:text-white text-black text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-10"
+        >
+            Latest Holiday Articles
+        </h2>
+
+        <!-- ImageGrid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            <div class="flex flex-col gap-3 pb-3">
+                <div
+                    class="w-full bg-center bg-no-repeat aspect-3/4 bg-cover rounded-lg overflow-hidden"
+                >
+                    <div
+                        class="w-full h-full bg-cover bg-center transition-transform duration-300 hover:scale-105"
+                        data-alt="A close-up of beautifully decorated Christmas sugar cookies on a wooden board."
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBfGOf9ZWXPfktl03okFio5fDfbEKwamHpUa0n8PAqPkyCH6Ih0h5A24h3D3lbnTano7cK0RRZ0s4N6rm14gY7K5ZlqQE5oE50TxQOpWz_6NddTmjWu-ZFZuRrv1V1VSMyfhOmFMjT8l5U3ryS0LFKuMpAUWxtiZIxDY0M2esrq_-Q1ZsEg2T56WARJNwzOwZXsw1x9BotirxS7CjOX6eCBW8j85v1SmOP951X225NYzXq41-byCWgIjtIJNjcLzJHB4MQYlNFXhxE");'
+                    >
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="text-[#c99294] text-sm font-normal leading-normal"
+                    >
+                        Recipes
+                    </p>
+                    <p
+                        class="dark:text-white text-black text-base font-medium leading-normal mt-1"
+                    >
+                        Our Top 5 Holiday Cookie Recipes
+                    </p>
+                    <p
+                        class="dark:text-white/70 text-black text-sm font-normal leading-normal mt-1"
+                    >
+                        From classic gingerbread to modern marvels, find your
+                        new favorite festive treat.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-3 pb-3">
+                <div
+                    class="w-full bg-center bg-no-repeat aspect-3/4 bg-cover rounded-lg overflow-hidden"
+                >
+                    <div
+                        class="w-full h-full bg-cover bg-center transition-transform duration-300 hover:scale-105"
+                        data-alt="Hands wrapping a Christmas present with brown paper and a red ribbon."
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAlhMNi6Ik7YuzqNNFUZdouze-5qJ3fj6COt75WNx2Fi1gUtxYYx1zqUlhUJ9Svqxg8IqKQyuRx9oapEmPib1lphY7nDTTBTbjsjCi4yIvNUntdHFb7x3vKghhTOoS62gYuRoMOD_YwOsNRmj4VQSwyk2QwxHQwUKFQQcaUF3xRHI176o03TlzAQ9G61dDCP2H_UCAWzhCE_zCNP_XajjTpmDrxRp5xQCkSN-yd_Wp_m31BnoKzRAHoF6N_7aVxwJn7s8aCaalHtBM");'
+                    >
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="text-[#c99294] text-sm font-normal leading-normal"
+                    >
+                        Reflections
+                    </p>
+                    <p
+                        class="dark:text-white text-black text-base font-medium leading-normal mt-1"
+                    >
+                        A Guide to Mindful Gifting This Season
+                    </p>
+                    <p
+                        class="text-white/70 text-sm font-normal leading-normal mt-1"
+                    >
+                        Thoughtful and sustainable gift ideas that show you
+                        care, without the clutter.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-3 pb-3">
+                <div
+                    class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-lg overflow-hidden"
+                >
+                    <div
+                        class="w-full h-full bg-cover bg-center transition-transform duration-300 hover:scale-105"
+                        data-alt="A minimalist living room decorated for Christmas with a simple tree and white ornaments."
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDd3W2sDpOfVWTuVXWZawW76-mHo4WHOaXrrD74M52RrJEqpwsgTGHqxqgRVQpAz0c1BaYYS6cxdoPWr-v_uEMgYh67_Cwlx0QJ7igzsoNooPOQ90IhNrAKK5V61N-j41PEj315bi8AtbbrZ-evzoUrAKDirOBqBDXvvre_TT_k5rvLBmnm_U-8WHFcO2czwdP4Ou9U5MPS4R8i4w1vt-gTLqOpI5cGNiNMQp-iOr2lAhwR3xUz5W5Dt1wE1UxkBhMFKQwviy8gS6w");'
+                    >
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="text-[#c99294] text-sm font-normal leading-normal"
+                    >
+                        Decor
+                    </p>
+                    <p
+                        class="text-white text-base font-medium leading-normal mt-1"
+                    >
+                        DIY Minimalist Christmas Decor Ideas
+                    </p>
+                    <p
+                        class="text-white/70 text-sm font-normal leading-normal mt-1"
+                    >
+                        Create a cozy and elegant holiday atmosphere with these
+                        simple, beautiful crafts.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Featured Card -->
+        <div class="p-4 @container mt-6">
+            <div
+                class="flex flex-col items-stretch justify-start rounded-lg bg-white/5 @xl:flex-row @xl:items-start p-4"
+            >
+                <div
+                    class="w-full @xl:w-2/5 aspect-video @xl:aspect-square bg-cover bg-center rounded-lg"
+                    data-alt="A flat lay of various beautifully wrapped Christmas gifts on a dark background."
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDp9hXiKCWV2PDOISrEe-syRCQVjIsGq5HSJWwgfD4aRli0ic2OWI1pMmhgZN-728BZgbSpUfoXgUnZlOH6uUV78ZiSxN1d9-_N-_f1Zu_GgY-eJRdsGdIlWZ5xXlzRlyonQdwjG03fD7d6MKpOOO4BtMAYUy3X0bnQNfwldPFTD0JQn4_fOdKwZ7BMGlbmJb5kpSQfREx2PgqMWrAiTSif_NGpbUrs-D1f2oHdebuvYw0cb2eeRLzvI4HeAlS2R025S5_MN042Kzk");'
+                >
+                </div>
+                <div
+                    class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-2 py-4 @xl:px-6 @xl:py-2"
+                >
+                    <p class="text-primary text-sm font-bold">FEATURED</p>
+                    <p
+                        class="text-white text-2xl font-bold leading-tight tracking-[-0.015em]"
+                    >
+                        The Ultimate Holiday Gift Guide
+                    </p>
+                    <p
+                        class="text-white/70 text-base font-normal leading-normal mt-2"
+                    >
+                        Find the perfect presents for everyone on your list with
+                        our curated guide, featuring unique and thoughtful ideas
+                        for all budgets. Discover unique gifts for friends,
+                        family, and loved ones.
+                    </p>
+                    <div class="flex items-end gap-3 justify-between mt-4">
+                        <button
+                            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-medium leading-normal hover:bg-primary/90 transition-colors"
+                        >
+                            <span class="truncate">View The Guide</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SectionHeader -->
+        <h2
+            class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-10"
+        >
+            More to Explore
+        </h2>
+        <!-- More Articles -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
+            <div class="flex flex-col gap-3 pb-3">
+                <div
+                    class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg overflow-hidden"
+                >
+                    <div
+                        class="w-full h-full bg-cover bg-center transition-transform duration-300 hover:scale-105"
+                        data-alt="A steaming mug of hot chocolate topped with marshmallows, next to a cozy blanket."
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDVxuTEBeQezVT5bGZ_PuUEctqKNsSqEL548QdjwSv0T_sou1bjC_e0ovNFjTZGNj8rs1BQprvDQ9QYkEaCG-JP-cVBT7a-Ux7U_unZdZMJBuFmqOcMgccMLED-jAN__lXv-CDU8WOpGYht2e-gk1Wnu-XELjLqoO8emcXrCUPULRj5HHuCyLmTKp4PYf8ywXo3vflKP5sY3TMSZpVyAJIVHWlFmzX5JndxGgd1dqVpcSZgXMen9CCsgy-TFXEuQPHWpQgmqF9TJZs");'
+                    >
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="text-[#c99294] text-sm font-normal leading-normal"
+                    >
+                        Recipes
+                    </p>
+                    <p
+                        class="text-white text-base font-medium leading-normal mt-1"
+                    >
+                        Cozy Drink Recipes for Winter Nights
+                    </p>
+                    <p
+                        class="text-white/70 text-sm font-normal leading-normal mt-1"
+                    >
+                        Warm up with these delightful and easy-to-make holiday
+                        beverages.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-col gap-3 pb-3">
+                <div
+                    class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg overflow-hidden"
+                >
+                    <div
+                        class="w-full h-full bg-cover bg-center transition-transform duration-300 hover:scale-105"
+                        data-alt="A family sitting around a fireplace, sharing stories and laughing."
+                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuArg8j5hnC0V4VI6u_L57k8YtmULc_G6UD5j_iDxs2NYv_oHDYsINlA--qffla1p7AkJ7M2gC7NJn2KzPPsi05EG5qWzH6KtYBYgnUESDKAhZmhK9tqfCwSJU1UWvZ7-n4ggkkQji9RixCmR8UoXL4YlkkJIi2oouKcNfs4SQCNgNtO6zp2cEwWX90X9fbDlSpjqE4WOPot78XEM7yMSfmXBRLtkvZxWfBoA0M6JXENbxeR6XTuWkBU3XCTUj8I39vCM8JVfe4-5qg");'
+                    >
+                    </div>
+                </div>
+                <div>
+                    <p
+                        class="text-[#c99294] text-sm font-normal leading-normal"
+                    >
+                        Traditions
+                    </p>
+                    <p
+                        class="text-white text-base font-medium leading-normal mt-1"
+                    >
+                        Creating New Holiday Traditions
+                    </p>
+                    <p
+                        class="text-white/70 text-sm font-normal leading-normal mt-1"
+                    >
+                        Ideas for making the holiday season more meaningful and
+                        personal for your family.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+</Layout>

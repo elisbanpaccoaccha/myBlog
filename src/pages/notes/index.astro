@@ -1,0 +1,148 @@
+---
+import Layout from "../../layouts/Layout.astro";
+---
+
+<Layout
+    title="Blog Tech - Notes"
+    ,
+    description="Las Notas son una forma de almacenar información importante y accesible en cualquier momento."
+>
+    <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+        <div class="w-full">
+            <h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
+                Notes
+                <span class="material-symbols-outlined text-green-500"
+                    >description</span
+                >
+            </h1>
+            <div class="space-y-8">
+                <article
+                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                    <header class="mb-3">
+                        <h2
+                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+                        >
+                            The power of component-based architecture
+                        </h2>
+                        <time
+                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
+                            datetime="2024-07-21">July 21, 2024</time
+                        >
+                    </header>
+                    <p
+                        class="text-on-surface-light dark:text-on-surface-dark/90"
+                    >
+                        Thinking about how breaking down UIs into reusable
+                        components not only speeds up development but also
+                        enforces consistency and makes maintenance a breeze.
+                        It’s a simple concept with a profound impact on
+                        scalability.
+                    </p>
+                </article>
+                <article
+                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                    <header class="mb-3">
+                        <h2
+                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+                        >
+                            A quick tip for centering in CSS
+                        </h2>
+                        <time
+                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
+                            datetime="2024-07-18">July 18, 2024</time
+                        >
+                    </header>
+                    <p
+                        class="text-on-surface-light dark:text-on-surface-dark/90"
+                    >
+                        Forget the old hacks. For most cases today, `display:
+                        grid; place-items: center;` is the cleanest and most
+                        reliable way to center an element both horizontally and
+                        vertically within its parent. Works like a charm every
+                        time.
+                    </p>
+                </article>
+                <article
+                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                    <header class="mb-3">
+                        <h2
+                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+                        >
+                            The importance of semantic HTML
+                        </h2>
+                        <time
+                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
+                            datetime="2024-07-15">July 15, 2024</time
+                        >
+                    </header>
+                    <p
+                        class="text-on-surface-light dark:text-on-surface-dark/90"
+                    >
+                        A reminder that using tags like `
+                    </p><nav>
+                        `, `<main>
+                            `, `<article>
+                                `, and `<footer>
+                                    ` isn't just for organization. It's crucial
+                                    for accessibility, helping screen readers
+                                    understand the structure of your page. It
+                                    also gives a small boost to SEO.
+                                </footer>
+                            </article>
+                        </main>
+                    </nav><p></p>
+                </article>
+                <article
+                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                    <header class="mb-3">
+                        <h2
+                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+                        >
+                            Dark mode isn't just a trend
+                        </h2>
+                        <time
+                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
+                            datetime="2024-07-12">July 12, 2024</time
+                        >
+                    </header>
+                    <p
+                        class="text-on-surface-light dark:text-on-surface-dark/90"
+                    >
+                        Implementing a dark mode toggle has become a standard
+                        user expectation. Beyond the aesthetic appeal, it
+                        reduces eye strain in low-light environments and can
+                        even save battery life on OLED screens. It's a
+                        thoughtful feature that improves user experience.
+                    </p>
+                </article>
+                <article
+                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+                >
+                    <header class="mb-3">
+                        <h2
+                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+                        >
+                            New project launch
+                        </h2>
+                        <time
+                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
+                            datetime="2024-07-10">July 10, 2024</time
+                        >
+                    </header>
+                    <p
+                        class="text-on-surface-light dark:text-on-surface-dark/90"
+                    >
+                        Excited to share a small side project I've been working
+                        on: a minimalist pomodoro timer built with vanilla JS.
+                        It's all about focus and simplicity. Check it out and
+                        let me know what you think!
+                    </p>
+                </article>
+            </div>
+        </div>
+    </section>
+</Layout>
