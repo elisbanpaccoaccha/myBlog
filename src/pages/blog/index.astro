@@ -1,330 +1,337 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { Rss, ArrowRight } from "@lucide/astro";
 ---
 
 <Layout
-    title="Blog Tech - Descubre lo mejor de las tecnologías."
-    ,
-    description="Hola Soy Epadev te invito a descrubrir las últimas tendencias y avances en tecnologías de vanguardia."
+  title="Blog Tech - Descubre lo mejor de las tecnologías."
+  ,
+  description="Hola Soy Epadev te invito a descrubrir las últimas tendencias y avances en tecnologías de vanguardia."
 >
-    <section class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-        <div class="grid grid-cols-12 gap-8">
-            <aside class="col-span-12 lg:col-span-2 hidden lg:block">
-                <nav class="sticky top-24">
-                    <h3
-                        class="font-semibold text-sm uppercase tracking-wider mb-4"
-                    >
-                        Categories
-                    </h3>
-                    <ul class="space-y-2 text-muted-light dark:text-muted-dark">
-                        <li>
-                            <a
-                                class="flex justify-between items-center hover:text-[#784329]"
-                                href="#"
-                                ><span>Blog</span><span class="text-xs">4</span
-                                ></a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                class="flex justify-between items-center hover:text-[#784329]"
-                                href="#"
-                                ><span>Technology</span><span class="text-xs"
-                                    >4</span
-                                ></a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                class="flex justify-between items-center hover:text-[#784329]"
-                                href="#"
-                                ><span>Projects</span><span class="text-xs"
-                                    >1</span
-                                ></a
-                            >
-                        </li>
-                    </ul>
-                </nav>
-            </aside>
-            <div class="col-span-12 lg:col-span-7">
-                <h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
-                    Blogs
-                    <span class="material-symbols-outlined text-orange-500"
-                        >rss_feed</span
-                    >
-                </h1>
-                <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhtHk-3ZR2NZ5-Ey6qy22deDHsfuKhdyZ3Z0EQpBjbyqqBk2r3CoOcg1QU73tbkJHUTYHBx97LIOw1aB3jX0rIhECEsIuLak1jT6N4I_QLuFkRyUFrhirGrpLpoTgpAUYWq6cNS6h846bLv6rIfdLDibifY5HShfVZ_RSzx4I8ZnRW10Fvw2GZ9uFPP7PXj8mlw8TdwxXRdWvSLsnEuhuS5plmj9_qLJo4eWUJmWWzFvuOO7-06FxhyX8okPSB5aR5xhuG2ExNBBo"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                Adding Webmentions to Astro Cactus
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                A guide on how to add webmentions to your Astro
-                                blog to display interactions from other
-                                websites.
-                            </p>
-                        </div>
-                    </a>
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU8NKNrxICswXgs5pjJjwtZwJI-T9TNneAlvxbFF9xRbyPsLOOfAdLmKDJDmMbths-SmTnhIO9SOBSIHL2J5UHGd81RilBAVrfYXWw8YeKffhAtfZE_KVZg2dnSKRq3Y2faH31FgPa3qdF5INMArY-Ge1Ei9XVyCwe50OOTCN22QC3yiQlhJM7DQvAhm3IeKpA6CpvJJLBsl5IngXbfnHO4U274XPFN1GIka7JR_rWgL6kE9SwBgvrZivi2zD4NqNKKat7hwDfiz8"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                A post of Markdown elements
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                This post showcases various Markdown elements
-                                and their styling within the blog's theme.
-                            </p>
-                        </div>
-                    </a>
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcTmLOd1MeMXt_MyywWrHCJSEALbuFBMHg01vYZvgFmQ4phQebHcaRocz42S4DpEkYm8CH6nVIXXhlg5RpjMoHJWwvwCHk3vvVmtkaqvuHj_5gC3PajRhwqJL5gbeZd5arJ4EB0BFD0ggVEiG86k5r9CzKYsKRx-544qDqN13S78vhfeuoBDqnzc4i0H-HaUdSoWFmtD_UlZvk_mrCDLo_rW03aINgsrRdwCWMZuhWmikD7dFCruda_0-tpzWoe4VVNjuTpdxVQXM"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                Markdown Admonitions
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                Learn how to use admonitions in Markdown to
-                                highlight important information, warnings, or
-                                tips.
-                            </p>
-                        </div>
-                    </a>
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8d1ojA55QyAzzMgJlthHo6nHy7xp9D75Y97-vApnzMdCj-RbqCCag3bDKP14vP-mD2-A4zTWGiYw12K33r11r1J1ABuHzLvAnmsnoTySS_1hw4worsveuj881HrBxq2zxIK_GkRfUawelu5Vp-DKi3lO-Dx7iPBG-5hiezWYiU6mmK-Mxx9_dPTX4qRuuyZsgFOOk9dxg32EWICwesgbVFrdW-KESd6TwmsluGEWN1NstGDWvKTlCwOOdbkVv-78m6IkOTnLTOTI"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                Example Cover Image
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                This post demonstrates how a cover image is
-                                displayed and integrated within a blog entry.
-                            </p>
-                        </div>
-                    </a>
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuALEn0L9UBufJpvB9jWgpwB7vMn3zh2O471F28j4wCAT9_N8fKzH5XEkOlkpXrCcnhjuRHZ9nNqS2Jp5p5UdiARUPLhCEArxSRdC2ZrNEis6ym5xUhvE5ofM8rzw4q7c5EWLJgU4EQ99zJgtq3bLrYvSeduY7jei7GmYqRH9KTa6A5hPqGAfRQ7duS0fT8zoX7YwQjflSr1oOSypObJegG2aN4D-b35jUTz1f0iG38jLDU2_tMlXWnwnDyNrcz_x5mF9_HOT6QMrEA"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                This post doesn't have any content
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                An example of a post that might only have a
-                                title and metadata without any body content.
-                            </p>
-                        </div>
-                    </a>
-                    <a
-                        class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                        href="#"
-                    >
-                        <img
-                            alt="Blog post thumbnail"
-                            class="w-full h-48 object-cover"
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoSvYoQWz_iFRGbnyAoyq8gMvmoYzPztQeEsQSI2awoNMJbxgiGg98UQg1KoctA_ukRoz4HAtsPxzde-qGkVsJT2xfc5SHDq1oezIxyZfx4XdjqMAIh5uaXl7QMfsJAckh9FsP61kZFRyTNWbWBUUg91bvXLuT8fyFWI99Xet4tFMiwT8HeWuBM8y9syWFt5TvcfXMhOHmSqZSTim7GDE8fOfBwByObI9KWe_YPNF96j6hem-5QZWdJv2rFyA8-8rPFOQq5kdjqzo"
-                        />
-                        <div class="p-6">
-                            <h3
-                                class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                            >
-                                Lorem ipsum dolor sit amet
-                            </h3>
-                            <p
-                                class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                            >
-                                Classic placeholder text used to demonstrate the
-                                typographic and layout features of the blog.
-                            </p>
-                        </div>
-                    </a>
-                </section>
+  <section class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
+        Blogs
+        <Rss class="w-5 h-5 text-orange-500" />
+      </h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              astro_config.js
             </div>
-            <aside class="col-span-12 lg:col-span-3">
-                <div class="sticky top-24 space-y-8">
-                    <div
-                        class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800"
-                    >
-                        <div class="flex items-center gap-4">
-                            <img
-                                alt="Author avatar"
-                                class="w-16 h-16 rounded-full bg-slate-300 dark:bg-slate-700"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsCgH9eHnTfvs6SITWyuipPL3fKY1PXhinCmaWDDXt0VfbfmH1S5MJOYp6Mwwm8bMigEfkexB-GDRWbKFEHft1uNR_C9g08RLBm9tjw52ERKMEtb3FjXHBGeho2Dpn-rPtNgxs6_oqoPPtFLhqvu8w6CpBfuygK70iKv_Z62Qy0HtUF_hY_2fQLcf1tm4fsScyz1O2QHY72n_JreNLyXhIOdeWtnZoOe4bsqO9kliVd4eDAaGwV6gHNc3t3x9Soorhb3aWG86ihWQ"
-                            />
-                            <div>
-                                <h3 class="font-semibold text-lg">About Me</h3>
-                                <p
-                                    class="text-sm text-muted-light dark:text-muted-dark"
-                                >
-                                    A modern blog template built with Astro.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <h3
-                            class="font-semibold text-sm uppercase tracking-wider"
-                        >
-                            Projects
-                        </h3>
-                        <a
-                            class="flex items-center gap-3 p-3 bg-surface-light dark:bg-surface-dark rounded-lg border border-slate-200 dark:border-slate-800 hover:border-primary dark:hover:border-primary transition-colors"
-                            href="#"
-                        >
-                            <div
-                                class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center"
-                            >
-                                <span class="material-symbols-outlined text-sm"
-                                    >rocket_launch</span
-                                >
-                            </div>
-                            <span class="text-sm font-medium"
-                                >My Astro Project</span
-                            >
-                        </a>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-baseline">
-                            <h3
-                                class="font-semibold text-sm uppercase tracking-wider"
-                            >
-                                Tags
-                            </h3>
-                            <a
-                                class="text-sm text-primary hover:underline"
-                                href="#">View all</a
-                            >
-                        </div>
-                        <div class="flex flex-wrap gap-2">
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#markdown</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#admonitions</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#webmentions</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#astro</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#social</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#test</a
-                            >
-                            <a
-                                class="px-2 py-1 text-xs font-mono text-primary bg-primary/10 rounded hover:bg-primary/20"
-                                href="#">#image</a
-                            >
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <h3
-                            class="font-semibold text-sm uppercase tracking-wider"
-                        >
-                            Contact
-                        </h3>
-                        <ul
-                            class="text-muted-light dark:text-muted-dark text-sm space-y-2"
-                        >
-                            <li>
-                                <a
-                                    class="flex items-center gap-3 hover:text-primary"
-                                    href="#"
-                                    ><span
-                                        class="material-symbols-outlined text-base"
-                                        >alternate_email</span
-                                    ><span>Email</span></a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    class="flex items-center gap-3 hover:text-primary"
-                                    href="#"
-                                    ><span
-                                        class="material-symbols-outlined text-base"
-                                        >link</span
-                                    ><span>Website</span></a
-                                >
-                            </li>
-                            <li>
-                                <a
-                                    class="flex items-center gap-3 hover:text-primary"
-                                    href="#"
-                                    ><span
-                                        class="material-symbols-outlined text-base"
-                                        >code</span
-                                    ><span>GitHub</span></a
-                                >
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </aside>
-        </div>
-    </section>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Abstract representation of code webmentions"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1SW59wqYgOL_yASCQVFJ8_29oWAW1qkzdndqzcGnINUX04l_rdfC7aCixYlfbcIlrWJiiv6jL6D8QX3v9Zz6IDyp5w_d8rrIn4lHABVC4S6rddDwJtU_uBuV2IXFWxKK1KD37loo3xJOCrlflwm5w0axr4H4_quBY9rnqSKJntcKi0X04yS-pzqSn1oZCStKXJFGIwz380r31anZkz59M0C5cWX9xem8fhr9hfoid6QSTmHpLcULOCjkZyw5N34hOONjXxGkvntw"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">const</span>
+              <span class="text-slate-500 dark:text-slate-400"
+                >date = "2023-10-12";</span
+              >
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              <span class="text-primary opacity-50 mr-1"
+                >{}Adding Webmentions to Astro Cactus<span
+                  class="text-primary opacity-50 ml-1"></span></span
+              >
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">01</span>A guide on
+              how to add webmentions to your Astro blog to display interactions
+              from across the web.
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="#"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              markdown.md
+            </div>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Minimalist typography poster style"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrxLp8RQU9YdvkKjAJBskq0ThMYHFWjWoaBoVPNcqC7yWBvP0tQrubeRw1OU8wtK-EMvguqQdEv3aiM-WJPdmU1uqCU-au8S_jwRnxkzKhBLfvsv1fCl9zOPfs2YDrjgUBFkIaTqFZuLCUDdbF1dmdwlKhY52M7FYhL7PGTSUz8eEOGdlAYCs7QUBnF54CWGMps6NNWa4Zp36NYAX6HIHkxzy27_jGy5aAFghNZ1qrH3_Y9MbeCoVFtFTdTqejhtOhcYDXwa1u3V4"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">let</span>
+              <span class="text-slate-500 dark:text-slate-400"
+                >category = "Tutorial";</span
+              >
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              <span class="text-primary opacity-50 mr-1">[</span>A post of
+              Markdown elements<span class="text-primary opacity-50 ml-1"
+                >]</span
+              >
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">02</span>This post
+              showcases various Markdown elements and their styling within the
+              application context.
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="#"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              warnings.tsx
+            </div>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Framed botanical leaf representing neat structure"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEscIt30JmrcCrjfSkFGXQL6D6yebYnOnOmW9a80EBw9SFEbVTgLxrheX_DOpg1r3LYl5uwjNKFWcQZsy1-LiJQdACtBN8s4N50L7hjvXNWRCWUppe85Liymn3y0kFohPUfDD929umzthN91Gy1W4MgPJ6tQ3jiabyu7Zppx6UBMQAqSWc6yMbIfmKo_7cgfQEbkI3qK72SkOdCT7zLKbiIJP4rkqOGYQSS6oGmIsOzYDOYf2yOiyqFW0ekZK5zdLJUzUVvmZokvo"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">import</span>
+              <span class="text-accent">"Alerts"</span>
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              Markdown Admonitions
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">03</span> Learn how to
+              use admonitions in Markdown to highlight important information effectively.
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="#"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              style.css
+            </div>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Desk setup with code on screen"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK-KiafzJSg0iuZ7ase0xFHHlr47C7t5P-zqqKKJTaLk-q4wyEolIY8xuwujBGnirJhBVS1g-dwLg6FwNAkRVHqnVpaGSauD0xI2chWt9gomjJwBa30q5eflNG5kR7NcvfnbagtbBxHLIomRVlBx8-MfgqE4wDyIBfAXQGCandJeuvdVPCcTVPKCJtYbjExCp4PC9ZDJt5aobt6Zo8VJiC6gPriF1tDoHpMzfXYegAOORqtdorYcT0zRZ65HQaWizlPMeG7SlVV8c"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">@media</span>
+              <span class="text-accent">(screen)</span>
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              Example Cover Image
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">04</span>
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="#"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              api.ts
+            </div>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Computer code on a dark screen"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBKLhCPqtTVzRG5k1lfACUk6Xi-TV5qNNTD03cpWPichR4bVOTSSD6zTh8hDb4JfKao3oTFDHSQ5P-loH-e8FgWu93BaO2mbVEB0jjgpDoQ0OpRA3BUxLR0k_5oU-pBwpXjWONhm9NAOjisL0AqA_Gsz9AptSTU3oPcKBK0MHEMymbDKkbzFZc_7z4CTj3QuEpRWdqHvNUE54TAOsA--Qfrj9vMbfS5r7I3jmMMETFzKbN_O_l6LcE7tZ9rF3GJjvl2owQx1DdHN0"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">async</span>
+              <span class="text-slate-500 dark:text-slate-400"
+                >function fetchData()</span
+              >
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              <span class="text-primary opacity-50 mr-1">&lt;</span>Connecting
+              REST APIs<span class="text-primary opacity-50 ml-1">/&gt;</span>
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">05</span
+              >Understanding the fundamentals of fetching data in modern
+              JavaScript frameworks.
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="#"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+        <article
+          class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+        >
+          <div
+            class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+          >
+            <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+            <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+            <div class="ml-auto text-[10px] text-slate-400 font-mono">
+              tokens.json
+            </div>
+          </div>
+          <div
+            class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+          >
+            <div
+              class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+            >
+            </div>
+            <img
+              alt="Geometric abstract pattern"
+              class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6_ep2U6a2782kvNNR616dgunzuADDjnhncFhqrwSRK9LbQkchTUZZGMVKBR3qF-yargjCJ4iq7ilIF2_v6dChAQvSt6zr8Y2uIpDql2YBQhV_CD_AbWqd4NLLHSswGCvij9b-a4BVaZ_oONTrkDrYsQmbqn2MnLtLhJmoxFbJNoWGvRb5WEM5MLxUQd5qlBxP2xyLTtrp1dbf-9TwIBPjDn7WHu5M6pdRGfrjoJg2LM4E7YzIN_7Si0fOSK6ThKN2_ahQcOx4A_w"
+            />
+          </div>
+          <div class="p-6 flex-1 flex flex-col">
+            <div class="flex items-center gap-3 text-xs mb-3">
+              <span class="text-secondary font-bold">export</span>
+              <span class="text-accent">default theme</span>
+            </div>
+            <h2
+              class="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-primary transition-colors"
+            >
+              Building a Design System
+            </h2>
+            <p
+              class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+            >
+              <span class="text-slate-400 select-none mr-2">06</span>// TODO:
+              Refactor color palette variables for better scalability.
+            </p>
+            <a
+              class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+              href="/blog/hello-world/introduccion"
+            >
+              read_post()<ArrowRight class="w-4 h-4 ml-1" />
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
 </Layout>

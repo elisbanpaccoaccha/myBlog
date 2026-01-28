@@ -1,0 +1,104 @@
+---
+// components/Navigation.astro
+import { Sun, Menu } from "@lucide/astro";
+---
+
+<script>
+  const onDark = document.getElementById("toggle");
+  if (localStorage.getItem("theme") === "dark") {
+    document.documentElement.classList.add("dark");
+  }
+  if (localStorage.getItem("theme") === "light") {
+    document.documentElement.classList.remove("dark");
+  }
+  if (localStorage.getItem("theme") === null) {
+    localStorage.setItem("theme", "light");
+  }
+  onDark?.addEventListener("click", () => {
+    document.documentElement.classList.toggle("dark");
+
+    if (document.documentElement.classList.contains("dark")) {
+      localStorage.setItem("theme", "dark");
+    } else {
+      localStorage.setItem("theme", "light");
+    }
+  });
+</script>
+
+<header
+  class="sticky top-0 z-50 w-full backdrop-blur-md bg-background-light/90 dark:bg-background-dark/90 border-b border-border-light dark:border-border-dark"
+>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <div class="flex items-center gap-2 group cursor-pointer">
+        <span class="text-secondary dark:text-secondary font-bold text-xl"
+          >&lt;</span
+        >
+        <span
+          class="font-bold text-lg text-slate-900 dark:text-white group-hover:text-primary transition-colors"
+          >MyBlog</span
+        >
+        <span class="text-secondary dark:text-secondary font-bold text-xl"
+          >/&gt;</span
+        >
+      </div>
+      <nav class="hidden md:flex space-x-8 items-center">
+        <a
+          class="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors relative group"
+          href="/home"
+        >
+          <span
+            class="text-slate-400 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >./</span
+          >Home
+        </a>
+        <a
+          class="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors relative group"
+          href="/about"
+        >
+          <span
+            class="text-slate-400 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >./</span
+          >About
+        </a>
+        <a
+          class="text-sm text-primary font-bold relative group"
+          href="/"
+        >
+          <span class="text-slate-400 mr-1">./</span>Blog
+        </a>
+        <a
+          class="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors relative group"
+          href="/notes"
+        >
+          <span
+            class="text-slate-400 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >./</span
+          >Notes
+        </a>
+        <a
+          class="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors relative group"
+          href="/notes/navidad"
+        >
+          <span
+            class="text-slate-400 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            >./</span
+          >Navidad
+        </a>
+      </nav>
+      <div class="flex items-center space-x-4">
+        <button
+          class="p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
+          id="toggle"
+        >
+          <Sun class="w-5 h-5" />
+        </button>
+        <button
+          class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
+        >
+          <span class="material-icons-round text-xl">menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
