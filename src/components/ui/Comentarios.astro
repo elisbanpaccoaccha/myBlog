@@ -1,0 +1,101 @@
+---
+// aun en implementación
+
+---
+
+<div class="border-t border-gray-100 pt-12">
+  <h3
+    class="font-mono font-bold text-xl text-gray-900 mb-8 flex items-center gap-3"
+  >
+    Comentarios / Dudas
+    <span
+      class="text-xs font-sans font-medium text-[#ec4899] bg-[#ec4899]/10 px-2 py-0.5 rounded-full border border-[#ec4899]/20"
+      >2</span
+    >
+  </h3>
+  <div class="mb-12 relative group">
+    <textarea
+      class="w-full p-4 pl-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#ec4899]/20 focus:border-[#ec4899] focus:bg-white outline-none transition-all placeholder-gray-400 font-sans text-sm resize-none h-32"
+      placeholder="Escribe tu duda o comentario..."></textarea>
+    <div class="absolute bottom-3 right-3 flex items-center gap-2">
+      <button
+        class="bg-gray-900 hover:bg-black text-white text-xs font-bold py-2 px-4 rounded shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5"
+      >
+        Publicar Comentario
+      </button>
+    </div>
+  </div>
+  <div class="space-y-10">
+    <div
+      class="flex gap-4 md:gap-5 animate-in fade-in slide-in-from-bottom-2 duration-500"
+    >
+      <img
+        class="w-10 h-10 rounded-full bg-gray-100 object-cover border border-gray-100 shrink-0"
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTGYjIxfECncQzlzXshw7vcNc5Y_E57nWlbVV7krwBaiw3Nw2wbr8YXZl7sqZ_bqUuep1qbkNdu67_YkZ_f7fhymFIUYTZ_xWHsD5733AzKxhZ67DapRt7_hKOGwQxXQStG9dDhh2nvkk7B5e2dYstJXk5YITUnJ3PI1ht-z4ypP_cTxZvyQ1zkaZB5V5PlXH6f8R5Sw9Vk0c0mwlrPeosb82QBcHjNqaqtHm23BKIw-mhGvQsdY6pQk4XQ7kiqYVD-PmS31c6Mq8"
+      />
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="font-bold text-gray-900 text-sm font-sans"
+            >Ana García</span
+          >
+          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span class="text-xs text-gray-400">hace 2 horas</span>
+        </div>
+        <div
+          class="bg-white border border-gray-100 p-4 rounded-xl rounded-tl-none shadow-sm relative"
+        >
+          <p class="text-gray-600 text-sm font-sans leading-relaxed">
+            Excelente explicación sobre la inmutabilidad. ¿Recomiendas usar
+            imágenes basadas en Alpine siempre para producción? He tenido
+            algunos problemas con librerías nativas.
+          </p>
+        </div>
+        <button
+          class="text-gray-500 hover:text-[#ec4899] text-xs font-bold mt-2 ml-2 transition-colors flex items-center gap-1 group"
+        >
+          <span
+            class="material-symbols-outlined text-[14px] group-hover:-rotate-12 transition-transform"
+            >reply</span
+          >
+          Responder
+        </button>
+      </div>
+    </div>
+    <div
+      class="flex gap-4 md:gap-5 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-100"
+    >
+      <div
+        class="w-10 h-10 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-sm"
+      >
+        CR
+      </div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="font-bold text-gray-900 text-sm font-sans"
+            >Carlos R.</span
+          >
+          <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+          <span class="text-xs text-gray-400">hace 5 horas</span>
+        </div>
+        <div
+          class="bg-white border border-gray-100 p-4 rounded-xl rounded-tl-none shadow-sm relative"
+        >
+          <p class="text-gray-600 text-sm font-sans leading-relaxed">
+            Justo lo que necesitaba para mi pipeline de CI. ¡Gracias! La
+            comparación con VMs dejó todo muy claro, especialmente el tema del
+            aislamiento de procesos.
+          </p>
+        </div>
+        <button
+          class="text-gray-500 hover:text-[#ec4899] text-xs font-bold mt-2 ml-2 transition-colors flex items-center gap-1 group"
+        >
+          <span
+            class="material-symbols-outlined text-[14px] group-hover:-rotate-12 transition-transform"
+            >reply</span
+          >
+          Responder
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

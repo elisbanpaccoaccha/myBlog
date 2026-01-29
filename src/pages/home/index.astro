@@ -1,120 +1,128 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import { BookOpen, ArrowRight, Code, Sparkles } from "@lucide/astro";
 ---
 
 <Layout
-    title="Blog Tech - Encuentra la información que necesitas"
-    ,
-    description="Busca información sobre tecnología, diseño y crecimiento personal en mi blog personal. Sigue mis pensamientos y reflexiones."
+  title="Blog Tech - Encuentra la información que necesitas"
+  ,
+  description="Busca información sobre tecnología, diseño y crecimiento personal en mi blog personal. Sigue mis pensamientos y reflexiones."
 >
-    <section class="grow">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center py-24 sm:py-32">
-                <h1
-                    class="text-4xl sm:text-5xl font-bold tracking-tight text-on-surface-light dark:text-on-surface-dark"
-                >
-                    Insights and Ideas
-                </h1>
-                <p
-                    class="mt-6 text-lg max-w-2xl mx-auto text-muted-light dark:text-muted-dark"
-                >
-                    Welcome to my personal blog. Here, I share my thoughts on
-                    technology, design, and personal growth. Follow along for
-                    insights, tutorials, and reflections.
-                </p>
-                <div class="mt-10 flex items-center justify-center gap-x-6">
-                    <a
-                        class="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold dark:text-on-surface-dark shadow-sm hover:bg-primary/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary"
-                        href="/blog/"
-                    >
-                        View Latest Blogs
-                    </a>
-                    <a
-                        class="text-sm font-semibold leading-6 text-on-surface-light dark:text-on-surface-dark group"
-                        href="/about/"
-                    >
-                        About me <span
-                            aria-hidden="true"
-                            class="transition-transform group-hover:translate-x-1"
-                            >→</span
-                        >
-                    </a>
-                </div>
-            </div>
+  <section class="grow">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center py-24 sm:py-32">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <Sparkles class="w-8 h-8 text-primary" />
+          <h1
+            class="text-4xl sm:text-5xl font-bold tracking-tight text-on-surface-light dark:text-on-surface-dark"
+          >
+            Ideas y Reflexiones
+          </h1>
+          <Sparkles class="w-8 h-8 text-primary" />
         </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-            <h2 class="text-2xl font-bold mb-8">Latest Blogs</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <a
-                    class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                    href="#"
-                >
-                    <img
-                        alt="Blog post thumbnail"
-                        class="w-full h-48 object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhtHk-3ZR2NZ5-Ey6qy22deDHsfuKhdyZ3Z0EQpBjbyqqBk2r3CoOcg1QU73tbkJHUTYHBx97LIOw1aB3jX0rIhECEsIuLak1jT6N4I_QLuFkRyUFrhirGrpLpoTgpAUYWq6cNS6h846bLv6rIfdLDibifY5HShfVZ_RSzx4I8ZnRW10Fvw2GZ9uFPP7PXj8mlw8TdwxXRdWvSLsnEuhuS5plmj9_qLJo4eWUJmWWzFvuOO7-06FxhyX8okPSB5aR5xhuG2ExNBBo"
-                    />
-                    <div class="p-6">
-                        <h3
-                            class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                        >
-                            Adding Webmentions to Astro Cactus
-                        </h3>
-                        <p
-                            class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                        >
-                            A guide on how to add webmentions to your Astro blog
-                            to display interactions from other websites.
-                        </p>
-                    </div>
-                </a>
-                <a
-                    class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                    href="#"
-                >
-                    <img
-                        alt="Blog post thumbnail"
-                        class="w-full h-48 object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU8NKNrxICswXgs5pjJjwtZwJI-T9TNneAlvxbFF9xRbyPsLOOfAdLmKDJDmMbths-SmTnhIO9SOBSIHL2J5UHGd81RilBAVrfYXWw8YeKffhAtfZE_KVZg2dnSKRq3Y2faH31FgPa3qdF5INMArY-Ge1Ei9XVyCwe50OOTCN22QC3yiQlhJM7DQvAhm3IeKpA6CpvJJLBsl5IngXbfnHO4U274XPFN1GIka7JR_rWgL6kE9SwBgvrZivi2zD4NqNKKat7hwDfiz8"
-                    />
-                    <div class="p-6">
-                        <h3
-                            class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                        >
-                            A post of Markdown elements
-                        </h3>
-                        <p
-                            class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                        >
-                            This post showcases various Markdown elements and
-                            their styling within the blog's theme.
-                        </p>
-                    </div>
-                </a>
-                <a
-                    class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
-                    href="#"
-                >
-                    <img
-                        alt="Blog post thumbnail"
-                        class="w-full h-48 object-cover"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcTmLOd1MeMXt_MyywWrHCJSEALbuFBMHg01vYZvgFmQ4phQebHcaRocz42S4DpEkYm8CH6nVIXXhlg5RpjMoHJWwvwCHk3vvVmtkaqvuHj_5gC3PajRhwqJL5gbeZd5arJ4EB0BFD0ggVEiG86k5r9CzKYsKRx-544qDqN13S78vhfeuoBDqnzc4i0H-HaUdSoWFmtD_UlZvk_mrCDLo_rW03aINgsrRdwCWMZuhWmikD7dFCruda_0-tpzWoe4VVNjuTpdxVQXM"
-                    />
-                    <div class="p-6">
-                        <h3
-                            class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
-                        >
-                            Markdown Admonitions
-                        </h3>
-                        <p
-                            class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
-                        >
-                            Learn how to use admonitions in Markdown to
-                            highlight important information, warnings, or tips.
-                        </p>
-                    </div>
-                </a>
-            </div>
+        <p
+          class="mt-6 text-lg max-w-2xl mx-auto text-muted-light dark:text-muted-dark"
+        >
+          Bienvenido a mi blog personal. Aquí comparto mis pensamientos sobre
+          tecnología, diseño y crecimiento personal. Acompáñame para descubrir
+          ideas, tutoriales y reflexiones.
+        </p>
+        <div class="mt-10 flex items-center justify-center gap-x-6">
+          <a
+            class="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold dark:text-on-surface-dark shadow-sm hover:bg-primary/80 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-primary flex items-center gap-2"
+            href="/blog/"
+          >
+            <BookOpen class="w-4 h-4" />
+            Ver Últimos Blogs
+          </a>
+          <a
+            class="text-sm font-semibold leading-6 text-on-surface-light dark:text-on-surface-dark group flex items-center gap-2"
+            href="/about/"
+          >
+            Sobre mí
+            <ArrowRight
+              class="w-4 h-4 transition-transform group-hover:translate-x-1"
+            />
+          </a>
         </div>
-    </section>
+      </div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <h2 class="text-2xl font-bold mb-8 flex items-center gap-2">
+        <Code class="w-6 h-6 text-primary" />
+        Últimos Blogs
+      </h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <a
+          class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
+          href="#"
+        >
+          <img
+            alt="Miniatura del post del blog"
+            class="w-full h-48 object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhtHk-3ZR2NZ5-Ey6qy22deDHsfuKhdyZ3Z0EQpBjbyqqBk2r3CoOcg1QU73tbkJHUTYHBx97LIOw1aB3jX0rIhECEsIuLak1jT6N4I_QLuFkRyUFrhirGrpLpoTgpAUYWq6cNS6h846bLv6rIfdLDibifY5HShfVZ_RSzx4I8ZnRW10Fvw2GZ9uFPP7PXj8mlw8TdwxXRdWvSLsnEuhuS5plmj9_qLJo4eWUJmWWzFvuOO7-06FxhyX8okPSB5aR5xhuG2ExNBBo"
+          />
+          <div class="p-6">
+            <h3
+              class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
+            >
+              Añadiendo Webmentions a Astro Cactus
+            </h3>
+            <p
+              class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
+            >
+              Una guía sobre cómo agregar webmentions a tu blog en Astro para
+              mostrar interacciones desde otros sitios web.
+            </p>
+          </div>
+        </a>
+        <a
+          class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
+          href="#"
+        >
+          <img
+            alt="Miniatura del post del blog"
+            class="w-full h-48 object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU8NKNrxICswXgs5pjJjwtZwJI-T9TNneAlvxbFF9xRbyPsLOOfAdLmKDJDmMbths-SmTnhIO9SOBSIHL2J5UHGd81RilBAVrfYXWw8YeKffhAtfZE_KVZg2dnSKRq3Y2faH31FgPa3qdF5INMArY-Ge1Ei9XVyCwe50OOTCN22QC3yiQlhJM7DQvAhm3IeKpA6CpvJJLBsl5IngXbfnHO4U274XPFN1GIka7JR_rWgL6kE9SwBgvrZivi2zD4NqNKKat7hwDfiz8"
+          />
+          <div class="p-6">
+            <h3
+              class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
+            >
+              Un post de elementos Markdown
+            </h3>
+            <p
+              class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
+            >
+              Este post muestra varios elementos de Markdown y su estilo dentro
+              del tema del blog.
+            </p>
+          </div>
+        </a>
+        <a
+          class="group block bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-primary dark:hover:border-primary transition-colors"
+          href="#"
+        >
+          <img
+            alt="Miniatura del post del blog"
+            class="w-full h-48 object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcTmLOd1MeMXt_MyywWrHCJSEALbuFBMHg01vYZvgFmQ4phQebHcaRocz42S4DpEkYm8CH6nVIXXhlg5RpjMoHJWwvwCHk3vvVmtkaqvuHj_5gC3PajRhwqJL5gbeZd5arJ4EB0BFD0ggVEiG86k5r9CzKYsKRx-544qDqN13S78vhfeuoBDqnzc4i0H-HaUdSoWFmtD_UlZvk_mrCDLo_rW03aINgsrRdwCWMZuhWmikD7dFCruda_0-tpzWoe4VVNjuTpdxVQXM"
+          />
+          <div class="p-6">
+            <h3
+              class="text-lg font-semibold mb-2 text-on-surface-light dark:text-on-surface-dark group-hover:text-primary transition-colors"
+            >
+              Admoniciones en Markdown
+            </h3>
+            <p
+              class="text-sm text-muted-light dark:text-muted-dark line-clamp-2"
+            >
+              Aprende cómo usar admoniciones en Markdown para resaltar
+              información importante, advertencias o consejos.
+            </p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 </Layout>

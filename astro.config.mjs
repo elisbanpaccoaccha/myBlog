@@ -7,5 +7,11 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
+  markdown: {
+    // Puedes usar temas como 'dracula', 'github-dark', 'monokai', etc.
+    shikiConfig: {
+      theme: 'dracula',
+    },
+  },
 });

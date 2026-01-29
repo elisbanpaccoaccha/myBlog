@@ -31,12 +31,13 @@ const { description, title } = Astro.props;
   </head>
 
   <body
-    class="bg-background-light dark:bg-background-dark text-on-surface-light dark:text-on-surface-dark font-sans antialiased w-full"
+    class=" font-sans antialiased w-full"
   >
     <main class="justify-center items-center w-full">
       <Navigation />
       <slot />
     </main>
+      <Footer />
   </body>
-  <Footer />
+
 </html>

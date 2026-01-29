@@ -1,12 +1,11 @@
 ---
-/**
- * BuildingDesignSystem.astro
- * Astro + Tailwind CSS v4
- */
 import Layout from "../../../layouts/Layout.astro";
-const publishedDate: string = "2023-11-14";
-const author: string = "Dev Coder";
-const tags: string[] = ["css", "architecture"];
+import { ArrowRight, ThumbsUp, MessageSquare, Slash } from "@lucide/astro";
+
+import DetallesAutor from "../../../components/ui/DetallesAutor.astro";
+import Quote from "../../../components/ui/Quote.astro";
+import ReadCode from "../../../components/ui/ReadCode.astro";
+
 const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
 ---
 
@@ -15,12 +14,14 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
   ,
   description="Building Design System with Tailwind CSS v4 and Astro."
 >
-  <div class="relative z-10 w-full max-w-4xl mx-auto px-4 py-12 md:py-16">
+  <section
+    class="relative z-10 w-full max-w-4xl mx-auto px-4 py-12 md:py-16 text-gray-200 dark:text-gray-800"
+  >
     <div
-      class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
+      class="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-200 dark:border-gray-800 overflow-hidden"
     >
       <div
-        class="bg-gray-50 border-b border-gray-100 px-4 py-3 flex items-center gap-4"
+        class="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 px-4 py-3 flex items-center gap-4"
       >
         <div class="flex gap-2">
           <div
@@ -37,64 +38,29 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
           </div>
         </div>
         <div class="font-mono text-xs text-gray-400 select-none">
-          {titulo.toLowerCase().replace(/\s+/g, '-')}
+          {titulo.toLowerCase().replace(/\s+/g, "-")}
         </div>
       </div>
 
       <div class="p-8 md:p-16">
-        <!-- Fake code block -->
-        <div class="font-mono text-sm mb-8 space-y-2">
-          <div class="flex flex-wrap gap-2">
-            <span class="text-syntax-const font-bold">const</span>
-            <span class="text-syntax-var">publishedDate</span>
-            <span class="text-gray-400">=</span>
-            <span class="text-syntax-string">"{publishedDate}"</span><span
-              class="text-gray-400">;</span
-            >
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <span class="text-syntax-const font-bold">let</span>
-            <span class="text-syntax-var">author</span>
-            <span class="text-gray-400">=</span>
-            <span class="text-syntax-string">"{author}"</span><span
-              class="text-gray-400">;</span
-            >
-          </div>
-
-          <div class="flex flex-wrap gap-2">
-            <span class="text-syntax-const font-bold">const</span>
-            <span class="text-syntax-var">tags</span>
-            <span class="text-gray-400">=</span>
-            <span class="text-gray-800">[</span>
-            {
-              tags.map((tag, index) => (
-                <>
-                  <span class="text-syntax-string">"{tag}"</span>
-                  {index < tags.length - 1 && (
-                    <span class="text-gray-400">,</span>
-                  )}
-                </>
-              ))
-            }
-            <span class="text-gray-800">]</span><span class="text-gray-400"
-              >;</span
-            >
-          </div>
-        </div>
+        <DetallesAutor
+          fecha={"2023-11-14"}
+          autor={"Dev Coder"}
+          tags={["css", "architecture"]}
+        />
 
         <header class="mb-12">
           <h1
-            class="font-mono font-bold text-4xl md:text-5xl lg:text-6xl text-gray-900 tracking-tight leading-tight"
+            class="font-mono font-bold text-4xl md:text-5xl lg:text-6xl text-gray-900 dark:text-gray-50 tracking-tight leading-tight"
           >
-            <span class="text-syntax-brace">{`{`}</span>
+            <span class="text-[#A755F7]">{`{`}</span>
             Building a <br class="hidden md:block" />
             Design System
-            <span class="text-syntax-brace">{`}`}</span>
+            <span class="text-[#A755F7]">{`}`}</span>
           </h1>
 
           <div
-            class="mt-4 font-mono text-gray-500 text-sm md:text-base pl-2 border-l-2 border-brand-pink/50"
+            class="mt-4 font-mono text-gray-500 dark:text-gray-400 text-sm md:text-base pl-2 border-l-2 border-brand-pink/50"
           >
             <span class="text-brand-pink font-bold">01</span>
             Scaling a frontend application requires more than just good code.
@@ -104,7 +70,9 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
         <article
           class="prose prose-slate prose-lg max-w-none prose-headings:font-mono prose-p:font-sans"
         >
-          <p class="lead text-xl text-gray-600 mb-8 font-light">
+          <p
+            class="lead text-xl text-gray-600-dark dark:text-gray-400 mb-8 font-light"
+          >
             Scaling a frontend application requires more than just good code; it
             requires a consistent visual language. In this post, we'll refactor
             our color palette variables for better scalability.
@@ -117,6 +85,7 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
           </p>
 
           <h2 class="text-2xl font-bold mt-16 mb-6 font-mono text-gray-400">
+            <span class="text-[#94A2B8] font-bold size-5">{`##`}</span>
             The Problem
           </h2>
 
@@ -126,31 +95,23 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
             your brand color. We need a layer of abstraction.
           </p>
 
-          <div
-            class="my-10 font-mono text-sm not-prose rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-50"
-          >
-            <div
-              class="bg-gray-100 px-4 py-2 text-xs text-gray-500 border-b border-gray-200 flex justify-between"
-            >
-              <span>legacy-styles.css</span>
-              <span class="text-gray-400">[Read Only]</span>
-            </div>
-
-            <div class="p-4 overflow-x-auto text-gray-700">
-              <pre
-                is:raw
-                class="bg-transparent border-0 p-0 m-0 text-sm font-mono"><code>.button-primary {
+          <ReadCode
+            codigo={`
+.button-primary {
   background-color: #3b82f6;
   color: #ffffff;
 }
 
 .alert-error {
   color: #ef4444;
-}</code></pre>
-            </div>
-          </div>
+}
+`}
+            lenguaje={"css"}
+            nombreFile={"styles.css"}
+          />
 
           <h2 class="text-2xl font-bold mt-16 mb-6 font-mono text-gray-400">
+            <span class="text-[#94A2B8] font-bold size-5">{`##`}</span>
             Tokenizing Colors
           </h2>
 
@@ -161,20 +122,9 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
             > of the color.
           </p>
 
-          <div
-            class="my-10 font-mono text-sm not-prose rounded-lg overflow-hidden border border-gray-200 shadow-sm bg-gray-50"
-          >
-            <div
-              class="bg-gray-100 px-4 py-2 text-xs text-gray-500 border-b border-gray-200 flex justify-between"
-            >
-              <span>tokens.json</span>
-              <span class="text-gray-400">[Read/Write]</span>
-            </div>
-
-            <div class="p-4 overflow-x-auto text-gray-700">
-              <pre
-                is:raw
-                class="bg-transparent border-0 p-0 m-0 text-sm font-mono"><code>{
+          <ReadCode
+            nombreFile="tokens.json"
+            codigo=`{
   "colors": {
     "primary": {
       "main": "#3b82f6",
@@ -185,19 +135,13 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
       "error": "#ef4444"
     }
   }
-}</code></pre>
-            </div>
-          </div>
+}`
+            lenguaje="json"
+          />
 
-          <blockquote class="not-italic">
-            <span class="font-mono text-sm text-gray-400 block mb-2"
-              >// Quote</span
-            >
-            “A design system isn't a project, it's a product serving products.”
-            <br />
-            <span class="text-gray-400 text-sm mt-2 block">— Nathan Curtis</span
-            >
-          </blockquote>
+          <Quote author="Nathan Curtis">
+            A design system isn't a project, it's a product serving products.
+          </Quote>
 
           <p>
             By using these tokens, we can now update the entire theme by
@@ -207,9 +151,9 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
 
           <div class="mt-12 pt-8 border-t border-dashed border-gray-200">
             <h3
-              class="text-xl font-bold font-mono mb-4 text-gray-900 flex items-center gap-2"
+              class="text-xl font-bold font-mono mb-4 text-gray-900 dark:text-gray-50 flex items-center gap-2"
             >
-              <span class="text-brand-pink">function</span> conclusion()
+              <span class="text-[#EB4999]">function</span> conclusion()
             </h3>
             <p>
               Start small. You don't need a massive system from day one. Begin
@@ -226,7 +170,7 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
           >
             <span
               class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform"
-              >thumb_up</span
+              ><ThumbsUp /></span
             >
             42 Likes
           </span>
@@ -236,7 +180,7 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
           >
             <span
               class="material-symbols-outlined text-sm group-hover:scale-110 transition-transform"
-              >chat_bubble_outline</span
+              ><MessageSquare /></span
             >
             8 Comments
           </span>
@@ -247,11 +191,11 @@ const titulo: string = "Building Design System with Tailwind CSS v4 and Astro.";
             read_next()
             <span
               class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform"
-              >arrow_forward</span
+              ><ArrowRight /></span
             >
           </span>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </Layout>

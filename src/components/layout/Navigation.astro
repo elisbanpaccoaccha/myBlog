@@ -1,5 +1,4 @@
 ---
-// components/Navigation.astro
 import { Sun, Menu } from "@lucide/astro";
 ---
 
@@ -30,15 +29,15 @@ import { Sun, Menu } from "@lucide/astro";
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
-      <div class="flex items-center gap-2 group cursor-pointer">
-        <span class="text-secondary dark:text-secondary font-bold text-xl"
+      <div class="flex items-center gap-2 group cursor-pointer bg-transparent dark:text-white text-black ">
+        <span class=" font-bold text-xl  "
           >&lt;</span
         >
         <span
-          class="font-bold text-lg text-slate-900 dark:text-white group-hover:text-primary transition-colors"
+          class="font-bold text-lg  "
           >MyBlog</span
         >
-        <span class="text-secondary dark:text-secondary font-bold text-xl"
+        <span class=" font-bold text-xl "
           >/&gt;</span
         >
       </div>
@@ -76,15 +75,6 @@ import { Sun, Menu } from "@lucide/astro";
             >./</span
           >Notes
         </a>
-        <a
-          class="text-sm font-medium hover:text-primary dark:hover:text-primary transition-colors relative group"
-          href="/notes/navidad"
-        >
-          <span
-            class="text-slate-400 mr-1 opacity-0 group-hover:opacity-100 transition-opacity"
-            >./</span
-          >Navidad
-        </a>
       </nav>
       <div class="flex items-center space-x-4">
         <button
@@ -96,7 +86,7 @@ import { Sun, Menu } from "@lucide/astro";
         <button
           class="md:hidden p-2 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-400"
         >
-          <span class="material-icons-round text-xl">menu</span>
+          <Menu class="w-5 h-5" />
         </button>
       </div>
     </div>
