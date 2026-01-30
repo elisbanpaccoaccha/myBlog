@@ -1,0 +1,39 @@
+---
+interface Props {
+  titulo: string;
+  subtitulo?: string;
+  numeroCapitulo?: string;
+  capitulo?: string;
+}
+
+const { titulo, subtitulo, capitulo, numeroCapitulo } = Astro.props;
+---
+
+<header class="mb-12">
+  <h1
+    class="font-mono font-bold text-4xl md:text-5xl lg:text-6xl text-gray-900 dark:text-gray-50 tracking-tight leading-tight"
+  >
+    <span class="text-[#A755F7]">{`{`}</span>
+    {titulo}
+    <span class="text-[#A755F7]">{`}`}</span>
+
+    {
+      subtitulo && (
+        <span class="block text-2xl md:text-3xl mt-4 text-gray-400 font-normal">
+          : {subtitulo}
+        </span>
+      )
+    }
+  </h1>
+
+  {
+    capitulo && (
+      <div
+        class="mt-8 font-mono text-gray-500 text-sm md:text-base pl-2 border-l-2 border-[#ec4899]/50"
+      >
+        <span class="text-[#ec4899] font-bold">{numeroCapitulo}</span>
+        {capitulo}
+      </div>
+    )
+  }
+</header>

@@ -4,144 +4,152 @@ import { FileText } from "@lucide/astro";
 ---
 
 <Layout
-    title="Blog Tech - Notes"
-    ,
-    description="Las Notas son una forma de almacenar información importante y accesible en cualquier momento."
+  title="Blog Tech - Notas"
+  description="Las Notas son una forma de almacenar información importante y accesible en cualquier momento."
 >
-    <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
-        <div class="w-full">
-<h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
-    Notes
-    <FileText class="w-6 h-6 text-green-500" />
-</h1>
-            <div class="space-y-8">
-                <article
-                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
-                >
-                    <header class="mb-3">
-                        <h2
-                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
-                        >
-                            The power of component-based architecture
-                        </h2>
-                        <time
-                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
-                            datetime="2024-07-21">July 21, 2024</time
-                        >
-                    </header>
-                    <p
-                        class="text-on-surface-light dark:text-on-surface-dark/90"
-                    >
-                        Thinking about how breaking down UIs into reusable
-                        components not only speeds up development but also
-                        enforces consistency and makes maintenance a breeze.
-                        It’s a simple concept with a profound impact on
-                        scalability.
-                    </p>
-                </article>
-                <article
-                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
-                >
-                    <header class="mb-3">
-                        <h2
-                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
-                        >
-                            A quick tip for centering in CSS
-                        </h2>
-                        <time
-                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
-                            datetime="2024-07-18">July 18, 2024</time
-                        >
-                    </header>
-                    <p
-                        class="text-on-surface-light dark:text-on-surface-dark/90"
-                    >
-                        Forget the old hacks. For most cases today, `display:
-                        grid; place-items: center;` is the cleanest and most
-                        reliable way to center an element both horizontally and
-                        vertically within its parent. Works like a charm every
-                        time.
-                    </p>
-                </article>
-                <article
-                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
-                >
-                    <header class="mb-3">
-                        <h2
-                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
-                        >
-                            The importance of semantic HTML
-                        </h2>
-                        <time
-                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
-                            datetime="2024-07-15">July 15, 2024</time
-                        >
-                    </header>
-                    <p
-                        class="text-on-surface-light dark:text-on-surface-dark/90"
-                    >
-                        A reminder that using tags like `
-                    </p><nav>
-                        `, `<main>
-                            `, `<article>
-                                `, and `<footer>
-                                    ` isn't just for organization. It's crucial
-                                    for accessibility, helping screen readers
-                                    understand the structure of your page. It
-                                    also gives a small boost to SEO.
-                                </footer>
-                            </article>
-                        </main>
-                    </nav><p></p>
-                </article>
-                <article
-                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
-                >
-                    <header class="mb-3">
-                        <h2
-                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
-                        >
-                            Dark mode isn't just a trend
-                        </h2>
-                        <time
-                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
-                            datetime="2024-07-12">July 12, 2024</time
-                        >
-                    </header>
-                    <p
-                        class="text-on-surface-light dark:text-on-surface-dark/90"
-                    >
-                        Implementing a dark mode toggle has become a standard
-                        user expectation. Beyond the aesthetic appeal, it
-                        reduces eye strain in low-light environments and can
-                        even save battery life on OLED screens. It's a
-                        thoughtful feature that improves user experience.
-                    </p>
-                </article>
-                <article
-                    class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
-                >
-                    <header class="mb-3">
-                        <h2
-                            class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
-                        >
-                            New project launch
-                        </h2>
-                        <time
-                            class="text-sm font-mono text-muted-light dark:text-muted-dark"
-                            datetime="2024-07-10">July 10, 2024</time
-                        >
-                    </header>
-                    <p
-                        class="text-on-surface-light dark:text-on-surface-dark/90"
-                    >
-                        Excited to share a small side project I've been working
-                        on: a minimalist pomodoro timer built with vanilla JS.
-                        It's all about focus and simplicity. Check it out and
-                        let me know what you think!
-                    </p>
-                </article>
-            </div>
-        </div>
-    </section>
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-16">
+    <div class="w-full">
+      <h1 class="text-3xl font-bold mb-8 flex items-center gap-2">
+        Notas
+        <FileText class="w-6 h-6 text-green-500" />
+      </h1>
+      <div class="space-y-8">
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              El auge de la IA Agéntica (Agentic AI)
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-28">28 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            Ya no hablamos solo de chatbots que responden preguntas. La
+            tendencia dominante este año son los "Agentes de IA" capaces de
+            ejecutar flujos de trabajo complejos, interactuar con APIs y tomar
+            decisiones autónomas. Integrar estos agentes en el ciclo de
+            desarrollo es el nuevo estándar.
+          </p>
+        </article>
+
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              WebAssembly (Wasm) alcanza la madurez
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-25">25 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            Con el soporte generalizado del Wasm Garbage Collection (WasmGC) en
+            todos los navegadores modernos, lenguajes como Kotlin, Dart y Java
+            ahora compilan a la web con una eficiencia nativa real. Esto abre la
+            puerta a aplicaciones web de alto rendimiento que antes eran
+            imposibles.
+          </p>
+        </article>
+
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              La consolidación de las "Server Islands"
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-22">22 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            La arquitectura de islas se ha refinado. Frameworks como Astro y las
+            últimas versiones de React han normalizado la mezcla de contenido
+            estático con islas dinámicas de servidor. La renderización parcial
+            ya no es una novedad, es la arquitectura por defecto para sitios
+            escalables.
+          </p>
+        </article>
+
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              Rust domina la infraestructura moderna
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-18">18 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            Más allá del kernel de Linux, Rust se está convirtiendo en la
+            primera opción para herramientas de CLI y servicios de backend
+            críticos donde el rendimiento y la seguridad de memoria no son
+            negociables. Adoptarlo en 2026 es una inversión segura.
+          </p>
+        </article>
+
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              CSS Nativo: Scroll-driven Animations
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-15">15 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            Depender de JavaScript para animaciones de scroll es cosa del
+            pasado. Las nuevas APIs de CSS permiten vincular animaciones al
+            desplazamiento del usuario de forma nativa y performante, liberando
+            al hilo principal del navegador de cálculos innecesarios.
+          </p>
+        </article>
+
+        <article
+          class="p-6 bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800"
+        >
+          <header class="mb-3">
+            <h2
+              class="text-xl font-semibold text-on-surface-light dark:text-on-surface-dark"
+            >
+              De DevOps a Ingeniería de Plataforma
+            </h2>
+            <time
+              class="text-sm font-mono text-muted-light dark:text-muted-dark"
+              datetime="2026-01-10">10 de Enero, 2026</time
+            >
+          </header>
+          <p class="text-on-surface-light dark:text-on-surface-dark/90">
+            El enfoque ha cambiado: en lugar de que cada desarrollador gestione
+            toda su infraestructura, los equipos de Ingeniería de Plataforma
+            construyen "Plataformas Internas de Desarrollo" (IDP). Esto reduce
+            la carga cognitiva y estandariza los despliegues con Docker y
+            Kubernetes.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
 </Layout>

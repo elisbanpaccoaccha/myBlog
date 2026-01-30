@@ -1,0 +1,86 @@
+---
+import { ArrowRight } from "@lucide/astro";
+
+interface Props {
+  nombreArchivo: string;
+  titulo: string;
+  fecha: string;
+  descripcion: string;
+  numeroCapitulo: string;
+  linkImagen?: string;
+}
+
+const {
+  nombreArchivo,
+  titulo,
+  fecha,
+  descripcion,
+  numeroCapitulo,
+  linkImagen,
+} = Astro.props;
+---
+
+<article
+  class="group relative flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark overflow-hidden transition-all duration-300 hover:border-primary/50 dark:hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1"
+>
+  <div
+    class="h-6 bg-slate-100 dark:bg-slate-900 border-b border-border-light dark:border-border-dark flex items-center px-3 space-x-1.5"
+  >
+    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
+    <div class="ml-auto text-[10px] text-slate-400 font-mono">
+      {nombreArchivo}
+    </div>
+  </div>
+  <div
+    class="aspect-w-16 aspect-h-9 w-full overflow-hidden bg-slate-200 dark:bg-slate-800 relative"
+  >
+    <div
+      class="absolute inset-0 bg-linear-to-t from-surface-light dark:from-surface-dark to-transparent opacity-20 z-10"
+    >
+    </div>
+
+    {
+      linkImagen ? (
+        <img
+          alt="Representación abstracta de código y webmentions"
+          class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+          src={linkImagen}
+        />
+      ) : (
+        <img
+          alt="Representación abstracta de código y webmentions"
+          class="w-full h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105 filter saturate-50 group-hover:saturate-100"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1SW59wqYgOL_yASCQVFJ8_29oWAW1qkzdndqzcGnINUX04l_rdfC7aCixYlfbcIlrWJiiv6jL6D8QX3v9Zz6IDyp5w_d8rrIn4lHABVC4S6rddDwJtU_uBuV2IXFWxKK1KD37loo3xJOCrlflwm5w0axr4H4_quBY9rnqSKJntcKi0X04yS-pzqSn1oZCStKXJFGIwz380r31anZkz59M0C5cWX9xem8fhr9hfoid6QSTmHpLcULOCjkZyw5N34hOONjXxGkvntw"
+        />
+      )
+    }
+  </div>
+  <div class="p-6 flex-1 flex flex-col">
+    <div class="flex items-center gap-3 text-xs mb-3">
+      <span class="text-secondary font-bold">const</span>
+      <span class="text-slate-500 dark:text-slate-400">
+        date = "{fecha}";
+      </span>
+    </div>
+    <h2
+      class="text-xl font-bold mb-3 group-hover:text-primary transition-colors"
+    >
+      <span class="text-primary opacity-50 mr-1">{}</span>
+      {titulo}
+    </h2>
+    <p
+      class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4 flex-1"
+    >
+      <span class="text-slate-400 select-none mr-2">{numeroCapitulo}</span>
+      {descripcion}
+    </p>
+    <a
+      class="inline-flex items-center text-sm font-bold text-primary hover:text-secondary transition-colors mt-auto"
+      href={`/blog/${nombreArchivo}`}
+    >
+      leer_post()<ArrowRight class="w-4 h-4 ml-1" />
+    </a>
+  </div>
+</article>

@@ -1,0 +1,43 @@
+---
+interface Props {
+  fecha: string;
+  tiempo: string;
+  tags: string[];
+}
+
+const { fecha, tiempo, tags } = Astro.props;
+---
+
+<article class="font-mono text-sm mb-8 space-y-2">
+  <div class="flex flex-wrap gap-2">
+    <span class="text-[#e11d48] dark:text-[#FA77C2] font-bold">const</span>
+    <span class="text-[#475569] dark:text-[#F5F5EF]">ultimaActualizacion</span>
+    <span class="text-gray-400">=</span>
+    <span class="text-[#64748b] dark:text-[#D9E17E]">'{fecha}'</span><span class="text-gray-400"
+      >;</span
+    >
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <span class="text-[#e11d48] dark:text-[#FA77C2] font-bold">const</span>
+    <span class="text-[#475569] dark:text-[#F5F5EF]">tiempoLectura</span>
+    <span class="text-gray-400">=</span>
+    <span class="text-[#64748b] dark:text-[#D9E17E]">'{tiempo}'</span><span class="text-gray-400"
+      >;</span
+    >
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <span class="text-[#e11d48] dark:text-[#FA77C2] font-bold">const</span>
+    <span class="text-[#475569] dark:text-[#F5F5EF]">etiquetas</span>
+    <span class="text-gray-400">=</span>
+    <span class="text-[#64748b]">[</span>
+    {
+      tags.map((tag, index) => (
+        <>
+          <span class="text-[#64748b] dark:text-[#D9E17E]">"{tag}"</span>
+          {index < tags.length - 1 && <span class="text-gray-400">,</span>}
+        </>
+      ))
+    }
+    <span class="text-[#64748b]">]</span><span class="text-gray-400">;</span>
+  </div>
+</article>

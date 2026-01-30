@@ -1,0 +1,294 @@
+---
+// Importaciones de componentes
+import Byline from "../../../components/ui/blog/Byline.astro";
+import HeaderBlog from "../../../components/ui/blog/HeaderBlog.astro";
+import Autor from "../../../components/ui/blog/Autor.astro";
+import Codigo from "../../../components/ui/blog/Codigo.astro";
+import Plantilla from "../../../components/ui/blog/Plantilla.astro";
+
+// Iconos para identidad visual de secciones
+import {
+  ThumbsUp,
+  MessageSquare,
+  ExternalLink,
+  ShieldAlert,
+  Box,
+  HardDrive,
+  Activity,
+  Terminal,
+} from "@lucide/astro";
+---
+
+<Plantilla titulo="Fundamentos de Docker: Guía de Supervivencia">
+  <HeaderBlog
+    titulo="Docker: Guía de Inicio"
+    subtitulo="Todo lo que necesitas para arrancar, crear y limpiar contenedores sin perder la cabeza en la terminal."
+    capitulo="Fundamentos"
+    numeroCapitulo="01"
+  />
+
+
+    <Byline
+      fecha="2026-01-28"
+      tiempo="8 min read"
+      tags={["Docker", "Básicos", "CLI"]}
+    />
+
+    <div class="mt-8 mb-12 prose dark:prose-invert max-w-none">
+      <p class="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+        Bienvenido a Docker. Si estás aquí, es porque quieres dejar de sufrir con configuraciones de entorno y empezar a usar contenedores.
+        En este post no vamos a complicarnos con redes complejas ni volúmenes de datos (eso viene luego). Hoy vamos a centrarnos en lo esencial: 
+        <strong>cómo encender el motor, crear tu primera instancia y, muy importante, cómo limpiar el desorden después.</strong>
+      </p>
+    </div>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <Terminal  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          1. Primero lo primero: El Motor (Daemon)
+        </h2>
+      </div>
+
+      <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-5 mb-8 border-l-4 border-amber-500">
+        <h3 class="font-bold text-amber-800 dark:text-amber-300 mb-2 flex items-center gap-2">
+          <ShieldAlert size={18} />
+          Ojo con el "sudo"
+        </h3>
+        <p class="text-sm text-amber-900 dark:text-amber-200 leading-relaxed">
+           Ten mucho cuidado: usar <code>sudo docker</code> y <code>docker</code> (sin sudo) no es lo mismo. Cada uno tiene su propio contexto y permisos. 
+           Si empiezas usando sudo, mantente con él. Si tu usuario ya está en el grupo de docker (lo ideal), no lo uses. Mezclarlos te dará dolores de cabeza con permisos de archivos.
+        </p>
+      </div>
+
+      <p class="mb-4 text-gray-700 dark:text-gray-300">
+        Antes de tirar comandos, asegúrate de que el servicio está corriendo. En Linux, gestionamos esto con <code>systemctl</code>.
+      </p>
+
+      <Codigo
+        codigo={`# Iniciar Docker
+sudo systemctl start docker
+
+# Detener Docker (útil si necesitas liberar recursos)
+sudo systemctl stop docker
+
+# Evitar que inicie con el sistema (Deshabilitar)
+sudo systemctl disable docker`}
+        lenguaje="bash"
+        nombreFile="terminal"
+      />
+
+      <div class="mt-8">
+        <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">¿Docker Desktop o Nativo?</h4>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          A veces instalamos Docker Desktop y además tenemos el Docker nativo. Es crucial decirle a la terminal con cuál queremos hablar:
+        </p>
+        <Codigo
+          codigo={`# Usar el contexto de Docker Desktop
+docker context use desktop-linux
+
+# O volver al default del sistema
+docker context use default`}
+          lenguaje="bash"
+          nombreFile="terminal"
+        />
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <HardDrive  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          2. Los Planos: Imágenes
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        Piensa en las imágenes como los planos de una casa o el CD de instalación de un juego. Están ahí, listas para usarse, pero no hacen nada por sí mismas hasta que las "instanciamos".
+      </p>
+
+      <Codigo
+        codigo={`# Traer una imagen desde Docker Hub
+# Sintaxis: docker pull nombre:version
+docker pull minio/minio:latest
+
+# Ver qué imágenes tengo descargadas
+sudo docker images`}
+        lenguaje="bash"
+        nombreFile="terminal"
+      />
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <Box  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          3. La Acción: Contenedores
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        Aquí es donde la magia ocurre. Convertimos esa imagen estática en un proceso vivo. Tienes dos formas de hacerlo:
+        <strong>la forma manual (paso a paso)</strong> o <strong>la forma rápida</strong>.
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div>
+          <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 border-l-4 border-gray-300 pl-3">Forma Manual</h3>
+          <p class="text-xs text-gray-500 mb-3">Primero creas la caja, luego la enciendes. Útil si necesitas configurar cosas antes de arrancar.</p>
+          <Codigo
+            codigo={`# 1. Crear el contenedor
+docker create --name mi_minio minio/minio 
+
+# 2. Encenderlo
+docker start mi_minio`}
+            lenguaje="bash"
+            nombreFile="manual-step"
+          />
+        </div>
+        <div>
+          <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2 border-l-4 border-emerald-500 pl-3">Forma Rápida (Run)</h3>
+          <p class="text-xs text-gray-500 mb-3">Crea y arranca al mismo tiempo. Es lo que usamos el 90% de las veces.</p>
+          <Codigo
+            codigo={`# Todo en uno
+docker run --name mi_minio_rapido minio/minio
+
+# Tip: Si no le pones --name, Docker le pondrá un nombre gracioso aleatorio.`}
+            lenguaje="bash"
+            nombreFile="fast-step"
+          />
+        </div>
+      </div>
+
+      <h3 class="text-lg font-bold text-gray-800 dark:text-gray-200 mt-8 mb-4">¿Qué está pasando? (Logs y Estado)</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        Una vez arrancado, necesitas saber si sigue vivo o si explotó.
+      </p>
+
+      <Codigo
+        codigo={`# Ver contenedores ACTIVOS
+docker ps
+
+# Ver TODOS (incluyendo los apagados o fallidos)
+docker ps -a
+
+# Ver logs (la bitácora de lo que pasa dentro)
+docker logs mi_contenedor
+# Ver logs en tiempo real (como un tail -f)
+docker logs -f mi_contenedor`}
+        lenguaje="bash"
+        nombreFile="monitoring"
+      />
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <Activity size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          4. Limpieza y Eliminación
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        Docker ocupa espacio rápido. Aprender a borrar es tan importante como aprender a crear. 
+        Pero hay una regla de oro: <strong>No puedes borrar una imagen si un contenedor la está usando</strong> (aunque esté apagado).
+      </p>
+
+      <div class="space-y-8">
+        <div>
+          <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">Paso 1: Borrar Contenedores</h4>
+          <Codigo
+            codigo={`# Forma correcta: Primero detener, luego borrar
+docker stop mi_contenedor
+docker rm mi_contenedor
+
+# Forma "fuerza bruta" (Stop + Remove en uno)
+docker rm -f mi_contenedor`}
+            lenguaje="bash"
+            nombreFile="terminal"
+          />
+        </div>
+
+        <div>
+          <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">Paso 2: Borrar Imágenes</h4>
+          <Codigo
+            codigo={`# Borrar imagen normal
+docker rmi nombre_imagen
+# O usando el ID
+docker rmi IMAGE_ID
+
+# Forzar borrado (Cuidado: esto fuerza la eliminación aunque haya conflictos)
+docker rmi -f nombre_imagen`}
+            lenguaje="bash"
+            nombreFile="terminal"
+          />
+        </div>
+
+        <div class="bg-gray-50 dark:bg-gray-800/50 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">Trucos de Profesional (Advanced)</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            ¿Tienes una imagen que no se deja borrar porque tiene muchos contenedores viejos asociados? 
+            Este comando es una joya para limpiar en cascada:
+          </p>
+          <Codigo
+            codigo={`# Borra todos los contenedores basados en una imagen específica
+docker rm $(docker ps -a --filter ancestor=nombre_imagen -q)`}
+            lenguaje="bash"
+            nombreFile="cascade-cleanup.sh"
+          />
+          
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-4 mb-2">
+            O si quieres limpiar todo lo que no sirve ("Prune"):
+          </p>
+          <Codigo
+            codigo={`# Limpieza total (Imágenes huérfanas, caché, contenedores parados)
+docker system prune
+
+# Solo limpiar imágenes que no se usan
+docker image prune`}
+            lenguaje="bash"
+            nombreFile="prune"
+          />
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-20 pt-10 border-t border-gray-100 dark:border-gray-800">
+      <Autor
+        autor="Elisban Pacco"
+        descripcion="Desarrollador Full Stack. Me gusta explicar tecnología compleja con palabras simples."
+        twitter="https://twitter.com/juanperez"
+        github="https://github.com/juanperez"
+        linkedin="https://linkedin.com/in/juanperez"
+      />
+      
+      <div class="flex flex-col md:flex-row gap-6 justify-between items-center mt-8">
+        <div class="flex gap-4">
+           <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-pink-100 dark:hover:bg-pink-900/30 hover:text-pink-600 transition-all text-sm font-medium text-gray-600 dark:text-gray-400">
+            <ThumbsUp size={16} /> <span>Gracias</span>
+           </button>
+           <button class="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 transition-all text-sm font-medium text-gray-600 dark:text-gray-400">
+            <MessageSquare size={16} /> <span>Preguntar</span>
+           </button>
+        </div>
+        
+        <div class="flex gap-6 text-sm">
+          <a
+            class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors text-gray-600 text-xs"
+            href="https://docs.docker.com/get-started/"
+            target="_blank"
+          >
+            Documentacion oficial Docker <ExternalLink size={17} />
+          </a>
+          <a
+            class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors text-gray-600 text-xs"
+            href="https://hub.docker.com/"
+            target="_blank"
+          >
+            Docker Hub <ExternalLink size={17} />
+          </a>
+        </div>
+      </div>
+    </div>
+
+</Plantilla>

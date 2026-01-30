@@ -1,0 +1,70 @@
+---
+// componentes opcionales de blog para trabajar rapido
+import Byline from "../../../components/ui/blog/Byline.astro"; //ejem : <Byline fecha="2024-05-22" tiempo="7 min" tags={["Historia", "Fundamentos", "Filosofía Dev"]} />
+import HeaderBlog from "../../../components/ui/blog/HeaderBlog.astro"; //ejem : <HeaderBlog titulo="Hello World" subtitulo="La Historia del Ritual Mas Sagrado de la Programación" capitulo="Introduccion" numeroCapitulo="01" />
+import Autor from "../../../components/ui/blog/Autor.astro"; //ejem : <Autor autor="Juan Perez" imagen="https://i.pravatar.cc/150" descripcion="Escrito por Juan Perez, desarrollador Full Stack fascinado por la historia de la computación y los fundamentos que sostienen la tecnología moderna." twitter="https://twitter.com/juanperez" github="https://github.com/juanperez" linkedin="https://linkedin.com/in/juanperez" />
+import Codigo from "../../../components/ui/blog/Codigo.astro"; //ejem : <ReadCode codigo="json" lenguaje="json" nombreFile="hello.json" />
+import Plantilla from "../../../components/ui/blog/Plantilla.astro"; //ejem : <Plantilla titulo="hello-world"> ... </Plantilla>
+
+import {
+  ThumbsUp,
+  MessageSquare,
+  ExternalLink,
+  TriangleAlert,
+  Layers,
+  Server,
+} from "@lucide/astro";
+---
+
+<Plantilla titulo="">
+  //no borrar este componente, coloque su propio titulo
+  <Byline
+    fecha="2024-05-20"
+    tiempo="8 min"
+    tags={["DevOps", "Contenedores", "Arquitectura"]}
+  />
+
+  // contenido ...
+
+  <div
+    class="mt-16 pt-8 border-t border-gray-100 dark:border-gray-700 font-mono text-sm text-gray-500 dark:text-gray-400"
+  >
+    <Autor
+      autor="Juan Perez"
+      descripcion="Escrito por Juan Pérez, desarrollador Full Stack apasionado por NestJS y Angular."
+      twitter="https://twitter.com/juanperez"
+      github="https://github.com/juanperez"
+      linkedin="https://github.com/juanperez"
+    />
+    <div class="mb-10 flex flex-wrap gap-8 items-center justify-between">
+      <div class="flex gap-6">
+        <span
+          class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors group"
+        >
+          <ThumbsUp size={17} />
+          128 Me Gusta
+        </span>
+        <span
+          class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors group"
+        >
+          <MessageSquare size={17} />
+          32 Comentarios
+        </span>
+      </div>
+      <div class="flex gap-4">
+        <a
+          class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors text-gray-600 text-xs"
+          href="#"
+        >
+          Kubernetes 101 <ExternalLink size={17} />
+        </a>
+        <a
+          class="flex items-center gap-2 hover:text-[#ec4899] cursor-pointer transition-colors text-gray-600 text-xs"
+          href="#"
+        >
+          Pipelines de CI/CD <ExternalLink size={17} />
+        </a>
+      </div>
+    </div>
+  </div>
+</Plantilla>

@@ -1,0 +1,271 @@
+---
+// Importaciones de componentes
+import Byline from "../../../components/ui/blog/Byline.astro";
+import HeaderBlog from "../../../components/ui/blog/HeaderBlog.astro";
+import Autor from "../../../components/ui/blog/Autor.astro";
+import Codigo from "../../../components/ui/blog/Codigo.astro";
+import Plantilla from "../../../components/ui/blog/Plantilla.astro";
+
+// Iconos
+import {
+  Database,
+  FolderOpen,
+  Save,
+  Trash2,
+  RefreshCw,
+  Archive,
+  HardDrive,
+  AlertTriangle,
+  ArrowLeftRight
+} from "@lucide/astro";
+---
+
+<Plantilla titulo="Docker Volumes: Persistencia de Datos">
+  <HeaderBlog
+    titulo="Persistencia en Docker: ¡No pierdas tus datos!"
+    subtitulo="Los contenedores tienen amnesia. Aprende a usar Volúmenes y Bind Mounts para que tu base de datos sobreviva al reinicio."
+    capitulo="Almacenamiento"
+    numeroCapitulo="02"
+  />
+
+
+    <Byline
+      fecha="2026-01-28"
+      tiempo="12 min read"
+      tags={["Storage", "Database", "Backups"]}
+    />
+
+    <div class="mt-8 mb-12 prose dark:prose-invert max-w-none">
+      <p class="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+        Imagina que escribes una novela en un bloc de notas dentro de una habitación de hotel (el contenedor).
+        Si te vas del hotel (borras el contenedor), el bloc de notas se va a la basura.
+        Para guardar tu novela, necesitas guardarla en una caja fuerte externa o enviarla a tu casa. 
+        En Docker, esto se llama <strong>Volúmenes</strong>.
+      </p>
+    </div>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <ArrowLeftRight size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          1. El Dilema: Managed Volume vs. Bind Mount
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        Docker nos ofrece dos formas principales de guardar datos. La elección depende de 
+        si quieres rendimiento (Producción/DBs) o comodidad para editar código (Desarrollo).
+      </p>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="border border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-900/10 p-6 rounded-xl">
+          <div class="flex items-center gap-2 mb-4 text-green-700 dark:text-green-400">
+            <Database size={24} />
+            <h3 class="font-bold text-lg">Docker Managed Volume</h3>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Tú le dices a Docker: <em>"Necesito espacio, tú encárgate de dónde ponerlo"</em>.
+          </p>
+          <ul class="text-sm space-y-2 text-gray-700 dark:text-gray-300 list-disc list-inside">
+            <li><strong>Gestión:</strong> Docker administra todo.</li>
+            <li><strong>Ubicación:</strong> Oculta en las entrañas de Docker (`/var/lib/docker/volumes/...`).</li>
+            <li><strong>Rendimiento:</strong> ⚡️ Muy Alto (Nativo).</li>
+            <li><strong>Uso ideal:</strong> Bases de Datos (Postgres, MySQL, Redis).</li>
+          </ul>
+        </div>
+
+        <div class="border border-orange-200 dark:border-orange-900 bg-orange-50 dark:bg-orange-900/10 p-6 rounded-xl">
+          <div class="flex items-center gap-2 mb-4 text-orange-700 dark:text-orange-400">
+            <FolderOpen size={24} />
+            <h3 class="font-bold text-lg">Bind Mount</h3>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Tú le dices a Docker: <em>"Guarda los datos EXACTAMENTE en esta carpeta de mi PC"</em>.
+          </p>
+          <ul class="text-sm space-y-2 text-gray-700 dark:text-gray-300 list-disc list-inside">
+            <li><strong>Gestión:</strong> Tú administras la carpeta.</li>
+            <li><strong>Ubicación:</strong> Donde tú quieras (Escritorio, Documentos).</li>
+            <li><strong>Rendimiento:</strong> 🐢 Más lento (Capas de traducción de archivos).</li>
+            <li><strong>Uso ideal:</strong> Código fuente en desarrollo, configs rápidas.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <Database  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          2. Usando Docker Managed Volumes
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        Esta es la opción segura para bases de datos. Evitas problemas de permisos entre Windows/Mac/Linux.
+      </p>
+
+      <Codigo
+        codigo={`# OPCIÓN A: Crear primero, conectar después (Más ordenado)
+# 1. Crear el volumen explícitamente
+docker volume create volumen-seguro-db
+
+# 2. Usarlo en un contenedor
+# Sintaxis: -v nombre_volumen:ruta_interna_contenedor
+docker run -d --name mi-postgres \\
+  -v volumen-seguro-db:/var/lib/postgresql/data \\
+  postgres:15-alpine
+
+# OPCIÓN B: Crear al vuelo (Automático)
+# Si el volumen no existe, Docker lo crea por ti.
+docker run -d --name mi-postgres-2 \\
+  -v volumen-auto-creado:/var/lib/postgresql/data \\
+  postgres:15-alpine`}
+        lenguaje="bash"
+        nombreFile="managed-volumes"
+      />
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <FolderOpen  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          3. Usando Bind Mounts
+        </h2>
+      </div>
+
+      <div class="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-lg mb-4 border-l-4 border-amber-500">
+        <p class="text-sm text-amber-900 dark:text-amber-200">
+          <strong>Advertencia de Rutas:</strong> Windows, Mac y Linux escriben las rutas diferente. 
+          Para evitar errores, usamos <code>$(pwd)</code> (Print Working Directory) en la terminal para decirle "usa la carpeta donde estoy parado ahora mismo".
+        </p>
+      </div>
+
+      <Codigo
+        codigo={`# 1. Crear la carpeta en tu PC (host)
+mkdir mis-canciones
+
+# 2. Montarla en el contenedor
+# Sintaxis: -v "RUTA_DE_TU_PC:RUTA_DEL_CONTENEDOR"
+# Nota las comillas "" para evitar errores con espacios.
+
+docker run -d --name minio-local \\
+  -v "$(pwd)/mis-canciones":/data \\
+  minio/minio server /data
+
+# Ahora, si pones un archivo en la carpeta "mis-canciones" de tu PC,
+# aparecerá mágicamente dentro del contenedor.`}
+        lenguaje="bash"
+        nombreFile="bind-mounts"
+      />
+    </section>
+
+    <section class="mb-16">
+      <div class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4">
+        <HardDrive  size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          4. Administración y Limpieza
+        </h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">Inspección</h4>
+          <Codigo
+            codigo={`# Ver lista de volúmenes
+docker volume ls
+
+# Ver dónde está guardado realmente (Mountpoint)
+docker volume inspect nombre_volumen`}
+            lenguaje="bash"
+            nombreFile="inspect"
+          />
+        </div>
+        <div>
+          <h4 class="font-bold text-gray-800 dark:text-gray-200 mb-2">Eliminación</h4>
+          <Codigo
+            codigo={`# Borrar uno específico
+docker volume rm nombre_volumen
+
+# ☢️ LIMPIEZA TOTAL (PRUNE)
+# Borra TODOS los volúmenes no conectados a un contenedor ENCENDIDO.
+# ¡Cuidado! Si tienes una DB apagada, esto borrará sus datos.
+docker volume prune`}
+            lenguaje="bash"
+            nombreFile="cleanup"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16 bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+      <div class="flex items-center gap-3 mb-6">
+        <Archive size={28} />
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          5. Patrón "Sidecar" para Backups
+        </h2>
+      </div>
+
+      <p class="text-gray-600 dark:text-gray-400 mb-6">
+        ¿Cómo sacas datos de un <em>Docker Managed Volume</em> si no puedes ver la carpeta fácilmente? 
+        Usamos un contenedor temporal (generalmente Alpine Linux) que monta el volumen y tu carpeta actual, empaqueta todo y luego se autodestruye.
+        Suena a película de espías, pero es el estándar.
+      </p>
+
+      <div class="space-y-8">
+        <div>
+          <h3 class="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-200 mb-2">
+            <Save size={18} /> BACKUP (Docker ➔ PC)
+          </h3>
+          <Codigo
+            codigo={`# Creamos un contenedor temporal que hace el trabajo sucio
+docker run --rm \\
+  -v db_data:/data \\       # 1. Montamos el volumen a copiar
+  -v $(pwd):/backup \\      # 2. Montamos la carpeta actual para dejar el archivo
+  alpine \\                 # 3. Usamos una imagen ultra ligera
+  tar cvf /backup/mi_backup.tar /data  # 4. Comprimimos`}
+            lenguaje="bash"
+            nombreFile="backup.sh"
+          />
+        </div>
+
+        <div>
+          <h3 class="flex items-center gap-2 font-bold text-gray-800 dark:text-gray-200 mb-2">
+            <RefreshCw size={18} /> RESTORE (PC ➔ Docker)
+          </h3>
+          <p class="text-sm text-gray-500 mb-2">
+            Para restaurar es el proceso inverso. Necesitamos descomprimir el archivo `.tar` dentro del volumen.
+          </p>
+          <Codigo
+            codigo={`# Asumiendo que quieres restaurar en un volumen llamado "db_data_restore"
+docker run --rm \\
+  -v db_data_restore:/data \\   # 1. Volumen destino (debe existir o se crea)
+  -v $(pwd):/backup \\          # 2. Carpeta donde tienes el .tar
+  alpine \\
+  sh -c "cd /data && tar xvf /backup/mi_backup.tar --strip-components=1"
+  
+# Nota: usamos "sh -c" y "cd" para asegurarnos que los archivos
+# caigan exactamente donde deben estar.`}
+            lenguaje="bash"
+            nombreFile="restore.sh"
+          />
+        </div>
+      </div>
+    </section>
+
+    <div class="mt-16 text-center">
+      <p class="text-gray-600 dark:text-gray-400 italic">
+        "Un contenedor sin volumen es como un pez rojo: no recuerda nada después de 3 segundos (o un reinicio)."
+      </p>
+    </div>
+
+    <div class="mt-10 pt-10 border-t border-gray-100 dark:border-gray-800">
+      <Autor
+        autor="Elisban Pacco"
+        descripcion="Desarrollador Full Stack. Me gusta explicar tecnología compleja con palabras simples."
+        twitter="https://twitter.com/juanperez"
+        github="https://github.com/juanperez"
+        linkedin="https://linkedin.com/in/juanperez"
+      />
+    </div>
+
+</Plantilla>

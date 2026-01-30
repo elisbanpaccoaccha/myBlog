@@ -1,0 +1,298 @@
+---
+// Importaciones de componentes
+import Byline from "../../../components/ui/blog/Byline.astro";
+import HeaderBlog from "../../../components/ui/blog/HeaderBlog.astro";
+import Autor from "../../../components/ui/blog/Autor.astro";
+import Codigo from "../../../components/ui/blog/Codigo.astro";
+import Plantilla from "../../../components/ui/blog/Plantilla.astro";
+
+// Iconos
+import {
+  Network,
+  Globe,
+  Server,
+  Laptop,
+  Trash2,
+  Search,
+  ArrowRightLeft,
+  Wifi,
+} from "@lucide/astro";
+---
+
+<Plantilla titulo="Docker Networking: Conectando Contenedores">
+  <HeaderBlog
+    titulo="Networking: El Arte de Conectar Contenedores"
+    subtitulo="Olvídate de las IPs hardcodeadas. Aprende a comunicar tus servicios, exponer puertos y entender la magia del DNS interno de Docker."
+    capitulo="Conectividad"
+    numeroCapitulo="03"
+  />
+
+  <Byline
+    fecha="2026-01-28"
+    tiempo="15 min read"
+    tags={["Redes", "DNS", "Puertos"]}
+  />
+
+  <div class="mt-8 mb-12 prose dark:prose-invert max-w-none">
+    <p class="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
+      Por defecto, un contenedor es una isla aislada. No puede hablar con nadie
+      y nadie puede hablar con él. El Networking en Docker rompe ese
+      aislamiento. Veremos cómo exponer tu app al mundo (Puertos) y, lo más
+      importante, cómo hacer que tus contenedores "chateen" entre ellos usando
+      nombres en lugar de números.
+    </p>
+  </div>
+
+  <section class="mb-16">
+    <div
+      class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+    >
+      <Globe size={28} />
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        1. Exponiendo al Mundo (Port Mapping)
+      </h2>
+    </div>
+
+    <p class="text-gray-600 dark:text-gray-400 mb-6">
+      Para acceder a un contenedor desde tu navegador (Chrome/Edge), necesitas
+      hacer un "agujero" en el contenedor y conectarlo a un puerto de tu PC.
+      Esto se hace con la bandera <code>-p</code>.
+    </p>
+
+    <div
+      class="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-xl border border-blue-100 dark:border-blue-800 mb-6"
+    >
+      <h3 class="font-bold text-blue-900 dark:text-blue-200 mb-2">
+        Anatomía del Mapeo
+      </h3>
+      <code
+        class="text-xl font-mono text-blue-600 dark:text-blue-300 block mb-2"
+      >
+        -p HOST:CONTENEDOR
+      </code>
+      <ul class="text-sm text-gray-700 dark:text-gray-400 space-y-2">
+        <li>
+          <strong>HOST (3000):</strong> El puerto en TU computadora (donde tú escribes
+          localhost:3000).
+        </li>
+        <li>
+          <strong>CONTENEDOR (9000):</strong> El puerto donde la app escucha DENTRO
+          del contenedor (esto lo decide el creador de la imagen).
+        </li>
+      </ul>
+    </div>
+
+    <Codigo
+      codigo={`# Ejemplo práctico con MinIO (que usa 2 puertos)
+docker run -d \\
+  --name mi-nube-personal \\
+  -p 9000:9000 \\           # Puerto de la API (S3)
+  -p 9001:9001 \\           # Puerto del Dashboard Web
+  minio/minio server /data --console-address ":9001"
+
+# Ahora puedes ir a http://localhost:9001 en tu navegador.`}
+      lenguaje="bash"
+      nombreFile="port-mapping"
+    />
+  </section>
+
+  <section class="mb-16">
+    <div
+      class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+    >
+      <Network size={28} />
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        2. Comunicación Interna (Bridge)
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <div>
+        <h3 class="font-bold text-gray-800 dark:text-gray-200 mb-2">
+          El Problema de las IPs
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Cada vez que un contenedor se reinicia, Docker le asigna una IP nueva
+          aleatoria (ej: 172.17.0.2). Si configuras tu backend apuntando a esa
+          IP, mañana dejará de funcionar.
+          <strong>Las IPs en Docker son volátiles.</strong>
+        </p>
+      </div>
+      <div>
+        <h3 class="font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+          La Solución: DNS Mágico
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Al crear una <strong>User-Defined Network</strong>, Docker activa un
+          servidor DNS interno. Esto te permite conectar contenedores usando su <strong
+            >nombre</strong
+          > en lugar de su IP. Docker se encarga de traducir "base-de-datos" a "172.X.X.X"
+          automáticamente.
+        </p>
+      </div>
+    </div>
+
+    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 mt-8">
+      Paso a Paso: Creando nuestra Red
+    </h3>
+
+    <Codigo
+      codigo={`# 1. Crear una red propia (Driver tipo "bridge" es el default)
+docker network create mi-red-privada
+
+# 2. Conectar contenedores a esa red
+# Opción A: Al momento de crear (Recomendado)
+docker run -d --name app-1 --network mi-red-privada alpine sleep 3000
+docker run -d --name app-2 --network mi-red-privada alpine sleep 3000
+
+# Opción B: Conectar un contenedor que YA existe
+docker network connect mi-red-privada nombre_contenedor_existente`}
+      lenguaje="bash"
+      nombreFile="create-network"
+    />
+
+    <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4 mt-8">
+      Probando la conexión (Ping)
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      Vamos a entrar a un contenedor y probar si puede "ver" al otro por su
+      nombre.
+    </p>
+
+    <Codigo
+      codigo={`# Entrar a la terminal del contenedor app-1
+docker exec -it app-1 sh
+# (Nota: usamos 'sh' porque Alpine es ligero y no trae 'bash')
+
+# DENTRO DEL CONTENEDOR:
+/ # ping app-2
+
+# RESULTADO ESPERADO:
+# PING app-2 (172.18.0.3): 56 data bytes
+# 64 bytes from 172.18.0.3: seq=0 ttl=64 time=0.086 ms...
+
+# ¡Funciona! Docker resolvió "app-2" a su IP interna.`}
+      lenguaje="bash"
+      nombreFile="ping-test"
+    />
+  </section>
+
+  <section class="mb-16">
+    <div
+      class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+    >
+      <Search size={28} />
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        3. Inspección Profunda y DNS
+      </h2>
+    </div>
+
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      A veces las cosas fallan. Aquí tienes las herramientas de detective.
+    </p>
+
+    <Codigo
+      codigo={`# Ver todas las redes
+docker network ls
+
+# Ver los detalles (qué contenedores están conectados y sus IPs)
+docker network inspect mi-red-privada
+
+# ¿Cómo sabe Docker las IPs? (Archivo DNS interno)
+docker exec -it app-1 cat /etc/resolv.conf
+# Verás que apunta al DNS server interno de Docker (usualmente 127.0.0.11)`}
+      lenguaje="bash"
+      nombreFile="debug"
+    />
+  </section>
+
+  <section class="mb-16">
+    <div
+      class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+    >
+      <Laptop size={28} />
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        4. Modo Host (Sin Aislamiento)
+      </h2>
+    </div>
+
+    <div
+      class="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-5 rounded-r-lg mb-6"
+    >
+      <p class="text-amber-800 dark:text-amber-200 text-sm font-bold">
+        ⚠️ Limitación Importante: El modo <code>host</code> funciona nativamente solo
+        en Linux.
+      </p>
+      <p class="text-amber-800 dark:text-amber-200 text-sm mt-1">
+        En Docker Desktop (Mac/Windows), este modo no funciona como esperas
+        porque Docker corre dentro de una mini máquina virtual Linux oculta.
+      </p>
+    </div>
+
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      En modo host, eliminamos el aislamiento de red. El contenedor comparte la
+      MISMA tarjeta de red y dirección IP que tu máquina física. Esto mejora el
+      rendimiento (quita capas de red) pero es menos seguro y puede causar
+      conflictos de puertos.
+    </p>
+
+    <Codigo
+      codigo={`# Crear contenedor en modo host
+# NO usamos -p porque usa los puertos de tu PC directamente
+docker run -d --name nginx-rapido --network host nginx
+
+# Probar (en Linux)
+curl localhost:80`}
+      lenguaje="bash"
+      nombreFile="host-mode"
+    />
+  </section>
+
+  <section class="mb-16">
+    <div
+      class="flex items-center gap-3 mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"
+    >
+      <Trash2 size={28} />
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        5. Gestión y Limpieza
+      </h2>
+    </div>
+
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      No dejes redes zombies. Si borras los contenedores, la red sigue
+      existiendo.
+    </p>
+
+    <Codigo
+      codigo={`# Desconectar un contenedor de una red (sin apagarlo)
+docker network disconnect mi-red-privada app-1
+
+# Borrar una red (debe estar vacía primero)
+docker network rm mi-red-privada
+
+# ☢️ LIMPIEZA TOTAL
+# Borra todas las redes personalizadas que no se estén usando
+docker network prune`}
+      lenguaje="bash"
+      nombreFile="cleanup"
+    />
+  </section>
+
+  <div class="mt-20 pt-10 border-t border-gray-100 dark:border-gray-800">
+    <Autor
+      autor="Elisban Pacco"
+      descripcion="Desarrollador Full Stack. Me gusta explicar tecnología compleja con palabras simples."
+      twitter="https://twitter.com/juanperez"
+      github="https://github.com/juanperez"
+      linkedin="https://linkedin.com/in/juanperez"
+    />
+
+    <div class="flex gap-4 mt-6 justify-center">
+      <div
+        class="px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm text-gray-600 dark:text-gray-400"
+      >
+        Próximo Capítulo: <strong>Docker Compose</strong> (Donde todo esto se automatiza)
+      </div>
+    </div>
+  </div>
+</Plantilla>

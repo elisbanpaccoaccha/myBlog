@@ -1,0 +1,108 @@
+---
+import { Copy } from "@lucide/astro"; // Asegúrate de importar Check
+import { Code } from "astro:components";
+import type { CodeLanguage } from "astro";
+
+interface Props {
+  codigo: string;
+  lenguaje: CodeLanguage | undefined;
+  nombreFile: string;
+}
+
+const { codigo, lenguaje, nombreFile } = Astro.props;
+---
+
+<div
+  class="relative my-10 font-mono text-sm not-prose rounded-lg overflow-hidden border border-gray-200 shadow-sm dark:border-gray-600 bg-gray-50 dark:bg-gray-800 group-code"
+>
+  <div
+    class="bg-gray-100 dark:bg-gray-700 px-4 py-2 text-xs text-gray-500 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center"
+  >
+    <span class="font-medium text-gray-600 dark:text-gray-400">{nombreFile}</span>
+    
+    <div class="flex items-center gap-3">
+      <span class="text-gray-400 dark:text-gray-500 hidden sm:inline select-none">[Solo Lectura]</span>
+      
+      <button
+        class="copy-btn flex items-center gap-1.5 px-2 py-1 rounded cursor-pointer transition-all duration-200
+               text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-200/60
+               active:scale-95 dark:bg-gray-600/30"
+        title="Copiar al portapapeles"
+        data-code={codigo}
+      >
+        <span class="icon-copy flex items-center gap-1.5 transition-all duration-300">
+          <Copy size={15} />
+          <span class="font-medium">Copiar</span>
+        </span>
+
+        <span class="icon-check hidden items-center gap-1.5 px-1 text-emerald-600 dark:text-emerald-400 transition-all duration-300 ">
+ <span class="font-medium">¡Copiado!</span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div class="p-4 overflow-x-auto text-gray-700 dark:text-gray-300 bg-white/50 dark:bg-gray-800/50">
+    
+    <div class="block dark:hidden">
+      <Code 
+        code={codigo} 
+        lang={lenguaje} 
+        theme="one-light" 
+        wrap={true} 
+        class="bg-transparent! border-0 p-0 m-0 text-sm font-mono" 
+      />
+    </div>
+
+    <div class="hidden dark:block">
+      <Code 
+        code={codigo} 
+        lang={lenguaje} 
+        theme="dracula" 
+        wrap={true} 
+        class="bg-transparent! border-0 p-0 m-0 text-sm font-mono" 
+      />
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Tu script se mantiene igual, funciona perfecto
+  const copyButtons = document.querySelectorAll('.copy-btn');
+
+  copyButtons.forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const code = btn.getAttribute('data-code');
+      const copyIcon = btn.querySelector('.icon-copy');
+      const checkIcon = btn.querySelector('.icon-check');
+
+      if (!code) return;
+
+      try {
+        await navigator.clipboard.writeText(code);
+        
+        copyIcon?.classList.add('hidden');
+        checkIcon?.classList.remove('hidden');
+        // Pequeña corrección para animar la escala
+        requestAnimationFrame(() => {
+             checkIcon?.classList.remove('scale-90');
+             checkIcon?.classList.add('scale-100');
+        });
+
+        setTimeout(() => {
+          checkIcon?.classList.remove('scale-100');
+          checkIcon?.classList.add('scale-90'); // Volver a pequeño antes de ocultar
+          
+          setTimeout(() => {
+              checkIcon?.classList.add('hidden');
+              copyIcon?.classList.remove('hidden');
+          }, 150); // Esperar a que termine la transición
+        }, 2000);
+
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+  });
+</script>
