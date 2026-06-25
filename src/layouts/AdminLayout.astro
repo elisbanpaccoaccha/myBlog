@@ -1,0 +1,37 @@
+---
+// Here we would typically check session using lucia before rendering
+import AdminNav from '../components/admin/AdminNav';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title} - Admin Panel</title>
+    <style is:global>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #f4f6f8;
+        color: #333;
+      }
+      main {
+        max-width: 1000px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <AdminNav client:load />
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

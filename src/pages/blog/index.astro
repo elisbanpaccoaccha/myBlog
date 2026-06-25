@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/ui/PostCard.astro';
+---
+<BaseLayout title="Blog">
+  <div style="margin-bottom: 3rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">All Articles</h1>
+    <p style="color: #666; font-size: 1.1rem;">Read the latest stories and tutorials.</p>
+  </div>
+  
+  <div class="posts-grid" style="display: flex; flex-direction: column; gap: 1.5rem;">
+    <PostCard title="Hello World" slug="hello-world" date={new Date()} />
+    <PostCard title="Building with Astro DB and Turso" slug="building-with-astro-db" date={new Date(Date.now() - 86400000)} />
+  </div>
+</BaseLayout>

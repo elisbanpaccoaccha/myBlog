@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Login">
+  <div style="max-width: 400px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eaeaea;">
+    <h1 style="text-align: center; margin-top: 0;">Admin Login</h1>
+    <form method="POST" action="/api/auth/login" style="display: flex; flex-direction: column; gap: 1rem;">
+      <div>
+        <label for="username" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Username</label>
+        <input type="text" id="username" name="username" style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;" required />
+      </div>
+      <div>
+        <label for="password" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Password</label>
+        <input type="password" id="password" name="password" style="width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px;" required />
+      </div>
+      <button type="submit" style="padding: 0.75rem; background: #0070f3; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 1rem;">
+        Sign In
+      </button>
+    </form>
+  </div>
+</BaseLayout>

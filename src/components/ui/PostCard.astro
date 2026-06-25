@@ -1,0 +1,31 @@
+---
+interface Props {
+  title: string;
+  slug: string;
+  date: Date;
+}
+const { title, slug, date } = Astro.props;
+---
+<article class="post-card">
+  <h2><a href={`/blog/${slug}`}>{title}</a></h2>
+  <time>{date.toLocaleDateString()}</time>
+</article>
+
+<style>
+  .post-card {
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .post-card h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
+  .post-card a { color: #111; text-decoration: none; }
+  .post-card a:hover { color: #0070f3; }
+  .post-card time { color: #666; font-size: 0.9rem; }
+</style>

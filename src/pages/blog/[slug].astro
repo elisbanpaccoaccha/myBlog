@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CommentsSection from '../../components/ui/CommentsSection.astro';
+import { db, Posts } from 'astro:db';
+import { eq } from 'astro:db';
+
+export const prerender = false; // We are using SSR for this
+
+const { slug } = Astro.params;
+
+// Mock fetching from DB
+// const post = await db.select().from(Posts).where(eq(Posts.slug, slug!)).get();
+const post = {
+  title: 'Mock Post Title',
+  content: '<p>This is mock content because DB might not be seeded yet.</p><p>You are viewing the post with slug: <strong>' + slug + '</strong></p>',
+  publishedAt: new Date(),
+};
+
+if (!post) {
+  return Astro.redirect('/404');
+}
+---
+<BaseLayout title={post.title}>
+  <article style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid #eaeaea;">
+    <header style="margin-bottom: 2rem; border-bottom: 1px solid #eaeaea; padding-bottom: 1rem;">
+      <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{post.title}</h1>
+      <time style="color: #666; font-size: 0.9rem;">{new Date(post.publishedAt || Date.now()).toLocaleDateString()}</time>
+    </header>
+    
+    <div class="prose content" set:html={post.content} />
+    
+  </article>
+
+  <CommentsSection />
+</BaseLayout>
+
+<style is:global>
+  .prose {
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+  .prose p { margin-bottom: 1.5rem; }
+  .prose h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+</style>
