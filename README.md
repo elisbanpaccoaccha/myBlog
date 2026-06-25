@@ -1,52 +1,43 @@
-# 🚀 Blog Tech EPAdev
+# Astro Starter Kit: Minimal
 
-¡Bienvenido a **Blog Tech EPAdev**! 👋
-
-Este es un blog de tecnología y programación centrado en compartir conocimientos, ideas y experiencias con la comunidad de desarrolladores. 💻✨
-
-## 🎯 Acerca del Proyecto
-
-El objetivo de este espacio es:
-
-- 📚 **Compartir tutoriales** y guías sobre tecnologías modernas
-- 💡 **Publicar artículos** sobre mejores prácticas de desarrollo
-- 🤝 **Fomentar la colaboración** entre desarrolladores
-- 🧪 **Experimentar** con nuevas herramientas y frameworks
-
-## 🛠️ Tech Stack
-
-- **Astro** - Framework web ultrarrápido
-- **TypeScript** - Tipado estático para JavaScript
-- **CSS** - Estilos personalizados
-
-## 🚀 Comandos
-
-| Comando | Descripción |
-|---------|-------------|
-| `pnpm install` | Instala las dependencias |
-| `pnpm dev` | Inicia el servidor de desarrollo en `localhost:4321` |
-| `pnpm build` | Construye el sitio para producción |
-| `pnpm preview` | Previsualiza el build localmente |
-
-## 📂 Estructura
-
-```
-src/
-├── components/   # Componentes reutilizables
-├── layouts/      # Layouts principales
-├── pages/        # Páginas del sitio
-├── styles/       # Estilos globales
-└── assets/       # Recursos estáticos
+```sh
+pnpm create astro@latest -- --template minimal
 ```
 
-## 🤝 Contribuciones
+> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
 
-¡Las contribuciones son bienvenidas! Si tienes ideas, sugerencias o quieres colaborar, no dudes en abrir un issue o pull request. 💪
+## 🚀 Project Structure
 
-## 📄 Licencia
+Inside of your Astro project, you'll see the following folders and files:
 
-Este proyecto está bajo la Licencia MIT.
+```text
+/
+├── public/
+├── src/
+│   └── pages/
+│       └── index.astro
+└── package.json
+```
 
----
+Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
 
-⭐️ Si te gusta este proyecto, no olvides darle una estrella en GitHub!
+There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+
+Any static assets, like images, can be placed in the `public/` directory.
+
+## 🧞 Commands
+
+All commands are run from the root of the project, from a terminal:
+
+| Command                   | Action                                           |
+| :------------------------ | :----------------------------------------------- |
+| `pnpm install`             | Installs dependencies                            |
+| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
+| `pnpm build`           | Build your production site to `./dist/`          |
+| `pnpm preview`         | Preview your build locally, before deploying     |
+| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
+| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+
+## 👀 Want to learn more?
+
+Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
