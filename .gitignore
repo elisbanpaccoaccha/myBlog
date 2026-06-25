@@ -1,24 +1,147 @@
-# build output
+# =========================================================================
+# ASTRO & CORE BUILD OUTPUT (Despliegues locales y producción)
+# =========================================================================
 dist/
-# generated types
 .astro/
+.cache/
+.vite/
+*.tsbuildinfo
+out/
+build/
 
-# dependencies
+# =========================================================================
+# DEPENDENCIES & PACKAGE MANAGERS
+# =========================================================================
 node_modules/
+/jspm_packages/
+.pnpm-store/
 
-# logs
+# =========================================================================
+# CLOUD DEPLOYMENTS & EDGE PLATFORMS (SaaS / PaaS / Serverless)
+# =========================================================================
+# Vercel
+.vercel/
+
+# Netlify
+.netlify/
+
+# Cloudflare Wrangler (Edge workers)
+.wrangler/
+.dev.vars
+
+# Firebase
+.firebase/
+*-debug.log
+ui-debug.log
+firebase-debug-*.log
+
+# Serverless Framework
+.serverless/
+
+# Docker Local Dumps (evitar subir datos montados en contenedores locales)
+/docker/data/
+docker-compose.override.yml
+
+# =========================================================================
+# TESTING, COVERAGE & CI/CD
+# =========================================================================
+# Test coverage reports
+coverage/
+.nyc_output/
+
+# Playwright (E2E Testing reports & trace viewer)
+/playwright-report/
+/test-results/
+
+# Cypress (E2E Testing videos and screenshots)
+/cypress/screenshots/
+/cypress/videos/
+
+# Storybook
+/storybook-static/
+
+# Turborepo & Nx (Monorepos & Pipeline caches)
+.turbo/
+.nx/
+
+
+# Local and production secrets files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+*.env
+.env.backup
+.env.production
+
+# DO NOT ignore the configuration template
+!.env.example
+
+# Credentials, tokens and certificates
+*.pem
+*.key
+*.pub
+/certs/
+secrets.json
+credentials.json
+.aws/
+.gcloud/
+sftp.json
+
+
+# Media upload directories for local development (R2/S3 local emulation or disk drivers)
+/public/uploads/
+/public/temp/
+/public/assets/uploads/
+src/assets/uploads/
+*.tmp
+*.temp
+
+# =========================================================================
+# DATABASES (SQLite and local emulation)
+# =========================================================================
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+/db/local.db
+/db/data/
+
+# =========================================================================
+# LOGS & SYSTEM
+# =========================================================================
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-
-# environment variables
-.env
-.env.production
-
-# macOS-specific files
+lerna-debug.log*
+.eslintcache
+.prettiercache
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# jetbrains setting folder
+# =========================================================================
+# IDE / EDITORS (VS Code & JetBrains)
+# =========================================================================
 .idea/
+*.iws
+*.iml
+*.ipr
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.vscode/keybindings.json
+*.code-workspace
+.history/
+vscode/
