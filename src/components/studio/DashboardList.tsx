@@ -50,6 +50,8 @@ interface DashboardProps {
 
 export default function DashboardList({ initialPosts }: DashboardProps) {
   const [mounted, setMounted] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [statusFilter, setStatusFilter] = React.useState('ALL');
   const [openMenu, setOpenMenu] = React.useState<{ id: string, top?: number, bottom?: number, right: number } | null>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
@@ -104,6 +106,27 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
   const publishedCount = posts.filter(p => p.status === 'PUBLISHED').length;
   const draftCount = posts.filter(p => p.status === 'DRAFT').length;
 
+  const filteredPosts = React.useMemo(() => {
+    let result = [...posts];
+
+    if (statusFilter !== 'ALL') {
+      result = result.filter(post => post.status === statusFilter);
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(post => post.title.toLowerCase().includes(q));
+    }
+
+    result.sort((a, b) => {
+      const dateA = new Date(a.updatedAt || a.createdAt || 0).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt || 0).getTime();
+      return dateB - dateA;
+    });
+
+    return result;
+  }, [posts, searchQuery, statusFilter]);
+
   return (
     <>
       {/* Stats Cards */}
@@ -144,29 +167,49 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
         </div>
       </div>
 
+      {/* Barra superior de herramientas y filtros */}
+      <div className="flex items-center justify-between w-full mb-6">
+        {/* Lado Izquierdo: Título */}
+        <h1 className="text-2xl font-bold text-slate-900">Artículos</h1>
+
+        {/* Lado Derecho: Filtros y CTA */}
+        <div className="flex items-center gap-4">
+          {/* Buscar */}
+          <div className="relative w-64 shrink-0">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input 
+              type="text" 
+              placeholder="Buscar" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-shadow" 
+            />
+          </div>
+          
+          {/* Select de Estados */}
+          <div className="relative w-40 shrink-0">
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white cursor-pointer transition-shadow w-full"
+            >
+              <option value="ALL">Estados</option>
+              <option value="PUBLISHED">Publicados</option>
+              <option value="DRAFT">Borradores</option>
+            </select>
+            <svg className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+
+          {/* CTA Botón Principal */}
+          <a href="/studio/escribir" className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-md font-medium text-sm transition-colors flex items-center justify-center gap-2 shrink-0">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Nuevo Artículo
+          </a>
+        </div>
+      </div>
+
       {/* Content Management Panel */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm mb-8 relative z-10">
-        {/* Panel Header */}
-        <div className="p-4 flex flex-col sm:flex-row items-center justify-between border-b border-gray-200 gap-4">
-          <h2 className="text-lg font-bold text-gray-900">Content Management Panel</h2>
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" placeholder="Buscar" className="pl-9 pr-4 py-1.5 border border-gray-300 rounded-md text-sm w-full sm:w-48 outline-none focus:border-gray-900" />
-            </div>
-            <select className="py-1.5 px-3 border border-gray-300 rounded-md text-sm outline-none focus:border-gray-900 bg-white">
-              <option>Estados</option>
-              <option>Published</option>
-              <option>Draft</option>
-            </select>
-            <div className="flex items-center text-sm border border-gray-300 rounded-md overflow-hidden">
-              <span className="px-3 py-1.5 bg-gray-50 border-r border-gray-300 text-gray-600">Sort by</span>
-              <button className="px-3 py-1.5 bg-gray-100 font-medium text-gray-900 border-r border-gray-300">Date</button>
-              <button className="px-3 py-1.5 bg-white text-gray-600 hover:bg-gray-50">Title</button>
-            </div>
-          </div>
-        </div>
-
         {/* Contenedor Elástico de la Tabla */}
         <div className="w-full overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -187,16 +230,22 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
             
             <tbody className="divide-y divide-gray-100">
               {error && <tr><td colSpan={5} className="p-8 text-center text-red-500">Error al cargar los artículos.</td></tr>}
-              {posts.length === 0 && !error && (
+              {filteredPosts.length === 0 && !error && (
                 <tr>
                   <td colSpan={5} className="p-12 text-center text-gray-500">
-                    <p>Aún no has escrito ningún artículo.</p>
-                    <a href="/studio/escribir" className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline">Escribe el primero</a>
+                    {posts.length === 0 ? (
+                      <>
+                        <p>Aún no has escrito ningún artículo.</p>
+                        <a href="/studio/escribir" className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline">Escribe el primero</a>
+                      </>
+                    ) : (
+                      <p>No se encontraron resultados para los filtros actuales.</p>
+                    )}
                   </td>
                 </tr>
               )}
               
-              {posts.map(post => {
+              {filteredPosts.map(post => {
                 const isDraft = post.status === 'DRAFT';
                 return (
                   <tr key={post.id} className="hover:bg-gray-50 transition-colors h-[72px]">
