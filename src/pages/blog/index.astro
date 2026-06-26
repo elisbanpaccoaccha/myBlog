@@ -1,15 +1,118 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/ui/PostCard.astro';
+import { db } from '../../db/client.ts';
+import { posts as postsTable, users as usersTable, postTags, tags } from '../../db/schema.ts';
+import { eq, desc, sql } from 'drizzle-orm';
+
+// ─── Consulta: últimos 20 posts publicados con sus tags ─────────────────
+const rows = await db
+  .select({
+    id:          postsTable.id,
+    title:       postsTable.title,
+    slug:        postsTable.slug,
+    excerpt:     postsTable.excerpt,
+    coverImage:  postsTable.coverImage,
+    readingTime: postsTable.readingTime,
+    publishedAt: postsTable.publishedAt,
+    author:      usersTable.username,
+    tags:        sql<string | null>`GROUP_CONCAT(${tags.name}, ',')`,
+  })
+  .from(postsTable)
+  .leftJoin(usersTable, eq(postsTable.authorId, usersTable.id))
+  .leftJoin(postTags, eq(postTags.postId, postsTable.id))
+  .leftJoin(tags, eq(tags.id, postTags.tagId))
+  .where(eq(postsTable.status, 'PUBLISHED'))
+  .groupBy(postsTable.id)
+  .orderBy(desc(postsTable.publishedAt))
+  .limit(20);
+
+const posts = rows.map(row => ({
+  id:          row.id,
+  title:       row.title,
+  slug:        row.slug,
+  excerpt:     row.excerpt ?? '',
+  coverImage:  row.coverImage ?? '',
+  readingTime: row.readingTime,
+  publishedAt: new Date(row.publishedAt || 0),
+  author:      row.author ?? 'Admin',
+  tags:        row.tags ? row.tags.split(',').filter(Boolean) : [],
+}));
 ---
-<BaseLayout title="Blog">
-  <div style="margin-bottom: 3rem;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">All Articles</h1>
-    <p style="color: #666; font-size: 1.1rem;">Read the latest stories and tutorials.</p>
-  </div>
-  
-  <div class="posts-grid" style="display: flex; flex-direction: column; gap: 1.5rem;">
-    <PostCard title="Hello World" slug="hello-world" date={new Date()} />
-    <PostCard title="Building with Astro DB and Turso" slug="building-with-astro-db" date={new Date(Date.now() - 86400000)} />
+<BaseLayout
+  title="Artículos"
+  description="Lee los últimos artículos de tecnología, desarrollo web y más."
+>
+  <div class="blog-index">
+
+    <!-- Hero / Cabecera del feed -->
+    <div class="blog-hero">
+      <h1 class="blog-hero__title">Lecturas recientes</h1>
+      <p class="blog-hero__sub">Los mejores artículos sobre desarrollo web, tecnología y más.</p>
+    </div>
+
+    <!-- Feed de artículos -->
+    {posts.length > 0 ? (
+      <div class="blog-feed">
+        {posts.map(post => (
+          <PostCard
+            title={post.title}
+            slug={post.slug}
+            date={post.publishedAt}
+            excerpt={post.excerpt}
+            coverImage={post.coverImage}
+            tags={post.tags}
+            readingTime={post.readingTime}
+            author={post.author}
+          />
+        ))}
+      </div>
+    ) : (
+      <div class="blog-empty">
+        <p>Aún no hay artículos publicados.</p>
+        <a href="/studio/escribir">¡Escribe el primero!</a>
+      </div>
+    )}
+
   </div>
 </BaseLayout>
+
+<style>
+  .blog-index {
+    max-width:  728px;
+    margin:     0 auto;
+    padding:    2.5rem 1.25rem 4rem;
+  }
+  .blog-hero {
+    padding-bottom: 1.75rem;
+    border-bottom:  1px solid #e6e6e6;
+    margin-bottom:  0.5rem;
+  }
+  .blog-hero__title {
+    font-size:   2rem;
+    font-weight: 800;
+    color:       #1a1a1a;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.35rem;
+  }
+  .blog-hero__sub {
+    font-size: 1rem;
+    color:     #6b6b6b;
+  }
+  .blog-feed { margin-top: 0; }
+  .blog-empty {
+    text-align: center;
+    padding:    4rem 0;
+    color:      #6b6b6b;
+  }
+  .blog-empty a {
+    display:       inline-block;
+    margin-top:    1rem;
+    padding:       0.5rem 1.25rem;
+    background:    #1a1a1a;
+    color:         #fff;
+    border-radius: 999px;
+    font-size:     0.9rem;
+    font-weight:   600;
+  }
+</style>

@@ -1,14 +1,160 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/ui/PostCard.astro';
+import { db } from '../db/client.ts';
+import { posts as postsTable, users as usersTable, postTags, tags } from '../db/schema.ts';
+import { eq, desc, sql } from 'drizzle-orm';
+
+// Últimos 3 posts para la home page
+const rows = await db
+  .select({
+    id:          postsTable.id,
+    title:       postsTable.title,
+    slug:        postsTable.slug,
+    excerpt:     postsTable.excerpt,
+    coverImage:  postsTable.coverImage,
+    readingTime: postsTable.readingTime,
+    publishedAt: postsTable.publishedAt,
+    author:      usersTable.username,
+    tags:        sql<string | null>`GROUP_CONCAT(${tags.name}, ',')`,
+  })
+  .from(postsTable)
+  .leftJoin(usersTable, eq(postsTable.authorId, usersTable.id))
+  .leftJoin(postTags, eq(postTags.postId, postsTable.id))
+  .leftJoin(tags, eq(tags.id, postTags.tagId))
+  .where(eq(postsTable.status, 'PUBLISHED'))
+  .groupBy(postsTable.id)
+  .orderBy(desc(postsTable.publishedAt))
+  .limit(3);
+
+const posts = rows.map(row => ({
+  title:       row.title,
+  slug:        row.slug,
+  excerpt:     row.excerpt ?? '',
+  coverImage:  row.coverImage ?? '',
+  readingTime: row.readingTime,
+  publishedAt: new Date(row.publishedAt || 0),
+  author:      row.author ?? 'Admin',
+  tags:        row.tags ? row.tags.split(',').filter(Boolean) : [],
+}));
 ---
-<BaseLayout title="Home">
-  <section style="text-align: center; padding: 4rem 1rem; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); border-radius: 12px; margin-top: 2rem; border: 1px solid #eaeaea;">
-    <h1 style="font-size: 3.5rem; margin-bottom: 1rem; letter-spacing: -0.05em; line-height: 1.1;">Welcome to MyBlog</h1>
-    <p style="font-size: 1.25rem; color: #555; margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-      A modern, fast, and beautiful blog powered by Astro, Turso DB, and React Islands.
-    </p>
-    <a href="/blog" style="display: inline-block; padding: 0.75rem 2rem; background: #0070f3; color: #fff; text-decoration: none; border-radius: 999px; font-weight: 600; font-size: 1.1rem; transition: transform 0.2s, box-shadow 0.2s;">
-      Start Reading
-    </a>
+<BaseLayout
+  title="Inicio"
+  description="MyBlog — Artículos sobre desarrollo web, tecnología y más."
+>
+  <!-- ─── Hero ──────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="hero__badge">Blog</p>
+      <h1 class="hero__title">
+        Ideas que valen<br />la pena leer.
+      </h1>
+      <p class="hero__sub">
+        Artículos sobre desarrollo web, Astro, TypeScript y tecnología en general.
+      </p>
+      <a href="/blog" class="hero__cta">Explorar artículos</a>
+    </div>
   </section>
+
+  <!-- ─── Feed de posts recientes ──────────────────────────────────────── -->
+  {posts.length > 0 && (
+    <section class="home-feed">
+      <div class="home-feed__inner">
+        <div class="home-feed__header">
+          <h2 class="home-feed__title">Publicaciones recientes</h2>
+          <a href="/blog" class="home-feed__ver-mas">Ver todos →</a>
+        </div>
+        <div class="home-feed__list">
+          {posts.map(post => (
+            <PostCard
+              title={post.title}
+              slug={post.slug}
+              date={post.publishedAt}
+              excerpt={post.excerpt}
+              coverImage={post.coverImage}
+              tags={post.tags}
+              readingTime={post.readingTime}
+              author={post.author}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 </BaseLayout>
+
+<style>
+  /* ─── Hero ────────────────────────────────────────────────────────── */
+  .hero {
+    border-bottom: 1px solid #e6e6e6;
+    padding:       3.5rem 1.5rem 3rem;
+    background:    #ffffff;
+  }
+  .hero__inner {
+    max-width:  728px;
+    margin:     0 auto;
+  }
+  .hero__badge {
+    display:       inline-block;
+    font-size:     0.78rem;
+    font-weight:   700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color:         #1a8917;
+    margin-bottom: 1rem;
+  }
+  .hero__title {
+    font-family:    Georgia, 'Times New Roman', serif;
+    font-size:      clamp(2.2rem, 6vw, 3.5rem);
+    font-weight:    700;
+    line-height:    1.1;
+    letter-spacing: -0.03em;
+    color:          #1a1a1a;
+    margin-bottom:  1rem;
+  }
+  .hero__sub {
+    font-size:     1.05rem;
+    color:         #6b6b6b;
+    line-height:   1.65;
+    margin-bottom: 2rem;
+    max-width:     520px;
+  }
+  .hero__cta {
+    display:       inline-block;
+    padding:       0.65rem 1.4rem;
+    background:    #1a1a1a;
+    color:         #ffffff;
+    border-radius: 999px;
+    font-size:     0.92rem;
+    font-weight:   600;
+    transition:    background 0.15s;
+  }
+  .hero__cta:hover { background: #292929; }
+
+  /* ─── Feed reciente ─────────────────────────────────────────────── */
+  .home-feed { padding: 0 1.5rem; }
+  .home-feed__inner {
+    max-width: 728px;
+    margin:    0 auto;
+    padding:   2rem 0;
+  }
+  .home-feed__header {
+    display:         flex;
+    align-items:     baseline;
+    justify-content: space-between;
+    margin-bottom:   0.5rem;
+  }
+  .home-feed__title {
+    font-size:   1.1rem;
+    font-weight: 700;
+    color:       #1a1a1a;
+    letter-spacing: -0.01em;
+  }
+  .home-feed__ver-mas {
+    font-size:  0.85rem;
+    font-weight: 500;
+    color:      #6b6b6b;
+    transition: color 0.15s;
+  }
+  .home-feed__ver-mas:hover { color: #1a1a1a; }
+</style>

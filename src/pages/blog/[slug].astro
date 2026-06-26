@@ -1,44 +1,331 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import CommentsSection from '../../components/ui/CommentsSection.astro';
-import { db, Posts } from 'astro:db';
-import { eq } from 'astro:db';
+import { db } from '../../db/client.ts';
+import { posts as postsTable, users as usersTable, postTags, tags } from '../../db/schema.ts';
+import { eq, sql } from 'drizzle-orm';
+import { lucia } from '../../lib/lucia';
 
-export const prerender = false; // We are using SSR for this
+export const prerender = false;
 
 const { slug } = Astro.params;
+if (!slug) return Astro.redirect('/404');
 
-// Mock fetching from DB
-// const post = await db.select().from(Posts).where(eq(Posts.slug, slug!)).get();
-const post = {
-  title: 'Mock Post Title',
-  content: '<p>This is mock content because DB might not be seeded yet.</p><p>You are viewing the post with slug: <strong>' + slug + '</strong></p>',
-  publishedAt: new Date(),
-};
+// ─── Obtener el usuario actual para verificar permisos ────────────────────────
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+let currentUserId: string | null = null;
+if (sessionId) {
+  const { user } = await lucia.validateSession(sessionId);
+  if (user) currentUserId = user.id;
+}
 
-if (!post) {
+// ─── Consulta por slug ───────────────────────────────────────────────────────
+const rows = await db
+  .select({
+    id:          postsTable.id,
+    title:       postsTable.title,
+    slug:        postsTable.slug,
+    excerpt:     postsTable.excerpt,
+    coverImage:  postsTable.coverImage,
+    content:     postsTable.content,
+    readingTime: postsTable.readingTime,
+    publishedAt: postsTable.publishedAt,
+    status:      postsTable.status,
+    authorId:    postsTable.authorId,
+    author:      usersTable.username,
+    tags:        sql<string | null>`GROUP_CONCAT(${tags.name}, ',')`,
+  })
+  .from(postsTable)
+  .leftJoin(usersTable, eq(postsTable.authorId, usersTable.id))
+  .leftJoin(postTags, eq(postTags.postId, postsTable.id))
+  .leftJoin(tags, eq(tags.id, postTags.tagId))
+  .where(eq(postsTable.slug, slug))
+  .groupBy(postsTable.id)
+  .limit(1);
+
+if (rows.length === 0) {
   return Astro.redirect('/404');
 }
----
-<BaseLayout title={post.title}>
-  <article style="background: white; padding: 2rem; border-radius: 8px; border: 1px solid #eaeaea;">
-    <header style="margin-bottom: 2rem; border-bottom: 1px solid #eaeaea; padding-bottom: 1rem;">
-      <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">{post.title}</h1>
-      <time style="color: #666; font-size: 0.9rem;">{new Date(post.publishedAt || Date.now()).toLocaleDateString()}</time>
-    </header>
-    
-    <div class="prose content" set:html={post.content} />
-    
-  </article>
 
-  <CommentsSection />
+const row  = rows[0]!;
+
+// Filtro de privacidad: Si es borrador, solo el autor puede verlo
+if (row.status === 'DRAFT' && row.authorId !== currentUserId) {
+  return Astro.redirect('/404');
+}
+const post = {
+  title:       row.title,
+  slug:        row.slug,
+  excerpt:     row.excerpt ?? '',
+  coverImage:  row.coverImage ?? '',
+  content:     row.content,
+  readingTime: row.readingTime,
+  publishedAt: new Date(row.publishedAt || 0),
+  author:      row.author ?? 'Admin',
+  tags:        row.tags ? row.tags.split(',').filter(Boolean) : [],
+};
+
+// ─── Renderizar el AST JSON de TipTap a HTML ────────────────────────────────
+function renderNode(node: Record<string, unknown>): string {
+  const children = (): string => {
+    const content = node.content as Record<string, unknown>[] | undefined;
+    return content ? content.map(renderNode).join('') : '';
+  };
+
+  // Aplicar marcas inline
+  const applyMarks = (text: string, marks: Record<string, unknown>[] = []): string => {
+    return marks.reduce((acc, mark) => {
+      switch (mark.type) {
+        case 'bold':      return `<strong>${acc}</strong>`;
+        case 'italic':    return `<em>${acc}</em>`;
+        case 'code':      return `<code>${acc}</code>`;
+        case 'underline': return `<u>${acc}</u>`;
+        case 'strike':    return `<s>${acc}</s>`;
+        case 'link': {
+          const href = ((mark.attrs as Record<string, unknown>)?.href as string) ?? '#';
+          return `<a href="${href}" rel="noopener noreferrer">${acc}</a>`;
+        }
+        default: return acc;
+      }
+    }, text);
+  };
+
+  switch (node.type) {
+    case 'doc':        return children();
+    case 'paragraph':  return `<p>${children()}</p>`;
+    case 'text': {
+      const raw   = (node.text as string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const marks = (node.marks as Record<string, unknown>[]) ?? [];
+      return applyMarks(raw, marks);
+    }
+    case 'heading': {
+      const level = ((node.attrs as Record<string, unknown>)?.level as number) ?? 2;
+      return `<h${level}>${children()}</h${level}>`;
+    }
+    case 'bulletList':   return `<ul>${children()}</ul>`;
+    case 'orderedList':  return `<ol>${children()}</ol>`;
+    case 'listItem':     return `<li>${children()}</li>`;
+    case 'blockquote':   return `<blockquote>${children()}</blockquote>`;
+    case 'codeBlock':    return `<pre><code>${children()}</code></pre>`;
+    case 'hardBreak':    return '<br>';
+    case 'horizontalRule': return '<hr>';
+    case 'image': {
+      const src = ((node.attrs as Record<string, unknown>)?.src as string) ?? '';
+      const alt = ((node.attrs as Record<string, unknown>)?.alt as string) ?? '';
+      return `<img src="${src}" alt="${alt}" loading="lazy" />`;
+    }
+    default: return children();
+  }
+}
+
+let renderedContent = '';
+try {
+  const tiptapDoc = JSON.parse(post.content) as Record<string, unknown>;
+  renderedContent  = renderNode(tiptapDoc);
+} catch {
+  renderedContent = `<p>${post.content}</p>`;
+}
+
+const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+<BaseLayout
+  title={post.title}
+  description={post.excerpt || post.title}
+  image={post.coverImage || '/favicon.svg'}
+  type="article"
+>
+  <article class="article-layout">
+
+    <!-- ─── Cabecera del artículo (estilo Medium) ──────────────────────── -->
+    <header class="article-header">
+      <h1 class="article-title">{post.title}</h1>
+
+      <div class="article-meta">
+        <div class="article-meta__avatar" aria-hidden="true">
+          {post.author.charAt(0).toUpperCase()}
+        </div>
+        <div class="article-meta__info">
+          <span class="article-meta__author">{post.author}</span>
+          <span class="article-meta__details">
+            {post.readingTime} min de lectura · <time datetime={post.publishedAt.toISOString()}>{formattedDate}</time>
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ─── Línea de acciones (estilo Medium: aplausos, comentarios, etc.) -->
+    <div class="article-actions" role="toolbar">
+      <div class="article-actions__left">
+        <button class="action-btn" type="button" aria-label="Aplaudir">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M14.5 7.5L9 13l-1.5-1.5M7 18.5l-4-4a2.83 2.83 0 010-4l8-8a2 2 0 013 0l.5.5.5-.5a2 2 0 013 0l1 1a2 2 0 010 2.83l-.5.5.17.17a2 2 0 010 2.83L15 16l.17.17A2 2 0 0115 19l-1 1a2 2 0 01-2.83 0L10 18.83l-.5.5A2 2 0 017 18.5z"/>
+          </svg>
+        </button>
+        <button class="action-btn" type="button" aria-label="Comentar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+          </svg>
+        </button>
+      </div>
+      <div class="article-actions__right">
+        <button class="action-btn" type="button" aria-label="Guardar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
+          </svg>
+        </button>
+        <button class="action-btn" type="button" aria-label="Compartir">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Imagen de portada ──────────────────────────────────────────── -->
+    {post.coverImage && (
+      <figure class="article-cover">
+        <img src={post.coverImage} alt={post.title} />
+      </figure>
+    )}
+
+    <!-- ─── Cuerpo del artículo ───────────────────────────────────────── -->
+    <div class="prose article-body" set:html={renderedContent} />
+
+    <!-- ─── Etiquetas ────────────────────────────────────────────────── -->
+    {post.tags.length > 0 && (
+      <div class="article-tags">
+        {post.tags.map(tag => (
+          <a href={`/blog?tag=${tag}`} class="article-tag">{tag}</a>
+        ))}
+      </div>
+    )}
+
+  </article>
 </BaseLayout>
 
-<style is:global>
-  .prose {
-    font-size: 1.1rem;
-    line-height: 1.7;
+<style>
+  .article-layout {
+    max-width:  728px;
+    margin:     0 auto;
+    padding:    2.5rem 1.25rem 5rem;
   }
-  .prose p { margin-bottom: 1.5rem; }
-  .prose h2 { margin-top: 2.5rem; margin-bottom: 1rem; }
+
+  /* ─── Cabecera ─────────────────────────────────────────────────────── */
+  .article-header { margin-bottom: 1.5rem; }
+  .article-title {
+    font-family:    Georgia, 'Times New Roman', serif;
+    font-size:      clamp(1.75rem, 5vw, 2.5rem);
+    font-weight:    700;
+    line-height:    1.2;
+    color:          #1a1a1a;
+    letter-spacing: -0.02em;
+    margin-bottom:  1rem;
+  }
+
+  /* Meta: avatar + autor + fecha */
+  .article-meta {
+    display:     flex;
+    align-items: center;
+    gap:         0.75rem;
+  }
+  .article-meta__avatar {
+    width:          42px;
+    height:         42px;
+    border-radius:  50%;
+    background:     #1a1a1a;
+    color:          #fff;
+    font-size:      1rem;
+    font-weight:    700;
+    display:        flex;
+    align-items:    center;
+    justify-content: center;
+    flex-shrink:    0;
+  }
+  .article-meta__info {
+    display:        flex;
+    flex-direction: column;
+    gap:            0.1rem;
+  }
+  .article-meta__author {
+    font-weight: 600;
+    font-size:   0.95rem;
+    color:       #1a1a1a;
+  }
+  .article-meta__details {
+    font-size: 0.85rem;
+    color:     #6b6b6b;
+  }
+
+  /* ─── Barra de acciones (estilo Medium) ─────────────────────────────── */
+  .article-actions {
+    display:         flex;
+    justify-content: space-between;
+    align-items:     center;
+    padding:         0.75rem 0;
+    border-top:      1px solid #e6e6e6;
+    border-bottom:   1px solid #e6e6e6;
+    margin-bottom:   2rem;
+  }
+  .article-actions__left,
+  .article-actions__right {
+    display:     flex;
+    align-items: center;
+    gap:         0.5rem;
+  }
+  .action-btn {
+    display:       flex;
+    align-items:   center;
+    justify-content: center;
+    width:         36px;
+    height:        36px;
+    border:        none;
+    background:    transparent;
+    color:         #6b6b6b;
+    cursor:        pointer;
+    border-radius: 50%;
+    transition:    background 0.15s, color 0.15s;
+  }
+  .action-btn:hover {
+    background: #f2f2f2;
+    color:      #1a1a1a;
+  }
+
+  /* ─── Portada ────────────────────────────────────────────────────── */
+  .article-cover {
+    margin:   0 0 2.5rem;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .article-cover img {
+    width:   100%;
+    height:  auto;
+    display: block;
+  }
+
+  /* ─── Cuerpo del artículo ────────────────────────────────────────── */
+  .article-body { margin-bottom: 2.5rem; }
+
+  /* ─── Etiquetas ──────────────────────────────────────────────────── */
+  .article-tags {
+    display:    flex;
+    gap:        0.5rem;
+    flex-wrap:  wrap;
+    padding-top: 2rem;
+    border-top: 1px solid #e6e6e6;
+  }
+  .article-tag {
+    font-size:     0.83rem;
+    font-weight:   500;
+    color:         #6b6b6b;
+    background:    #f2f2f2;
+    padding:       0.3rem 0.75rem;
+    border-radius: 999px;
+    transition:    background 0.12s, color 0.12s;
+  }
+  .article-tag:hover {
+    background: #e6e6e6;
+    color:      #1a1a1a;
+  }
 </style>
