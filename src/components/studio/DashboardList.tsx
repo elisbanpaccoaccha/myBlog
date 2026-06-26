@@ -53,6 +53,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [statusFilter, setStatusFilter] = React.useState('ALL');
   const [openMenu, setOpenMenu] = React.useState<{ id: string, top?: number, bottom?: number, right: number } | null>(null);
+  const [toastMessage, setToastMessage] = React.useState<string | null>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -113,6 +114,18 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
     }
   };
 
+  const handleShare = async (slug: string) => {
+    setOpenMenu(null);
+    try {
+      const url = `${window.location.origin}/blog/${slug}`;
+      await navigator.clipboard.writeText(url);
+      setToastMessage('Enlace copiado al portapapeles');
+      setTimeout(() => setToastMessage(null), 3000);
+    } catch (e) {
+      alert('Error al copiar al portapapeles');
+    }
+  };
+
   const publishedCount = posts.filter(p => p.status === 'PUBLISHED').length;
   const draftCount = posts.filter(p => p.status === 'DRAFT').length;
 
@@ -139,6 +152,12 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
 
   return (
     <>
+      {toastMessage && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-medium z-50 shadow-lg transition-all duration-300">
+          {toastMessage}
+        </div>
+      )}
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col justify-between shadow-sm">
@@ -340,7 +359,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
                           >
                             {!isDraft && (
                               <>
-                                <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors">
+                                <button onClick={() => handleShare(post.slug)} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 transition-colors">
                                   <svg className="text-gray-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                                   Compartir
                                 </button>
