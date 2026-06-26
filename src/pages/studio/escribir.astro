@@ -1,0 +1,323 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import EditorWYSIWYG from '../../components/studio/EditorWYSIWYG';
+import TagSelector from '../../components/studio/TagSelector';
+import { actions } from 'astro:actions';
+import { db } from '../../db/client.ts';
+import { posts as postsTable, tags as tagsTable, postTags } from '../../db/schema.ts';
+import { eq, and } from 'drizzle-orm';
+import { lucia } from '../../lib/lucia.ts';
+
+// Verificar sesión
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect('/login');
+const { user } = await lucia.validateSession(sessionId);
+if (!user) return Astro.redirect('/login');
+
+// Procesar resultado de publicación si viene desde un redirect
+const result = Astro.url.searchParams.get('result');
+const slug   = Astro.url.searchParams.get('slug');
+
+// Si hay un ID en la URL, estamos en modo Edición
+const editId = Astro.url.searchParams.get('id');
+let post = null;
+let tags: string[] = [];
+
+if (editId) {
+  const postRows = await db
+    .select({
+      id:          postsTable.id,
+      title:       postsTable.title,
+      excerpt:     postsTable.excerpt,
+      coverImage:  postsTable.coverImage,
+      content:     postsTable.content,
+      status:      postsTable.status,
+    })
+    .from(postsTable)
+    .where(and(eq(postsTable.id, editId), eq(postsTable.authorId, user.id)))
+    .limit(1);
+
+  if (postRows.length > 0) {
+    post = postRows[0];
+    
+    // Cargar tags
+    const tagsRows = await db
+      .select({
+        name: tagsTable.name,
+      })
+      .from(tagsTable)
+      .innerJoin(postTags, eq(tagsTable.id, postTags.tagId))
+      .where(eq(postTags.postId, editId));
+
+    tags = tagsRows.map(r => r.name);
+  }
+}
+---
+<StudioLayout title={post ? "Editar Post" : "Escribir Post"}>
+
+  <div class="write-header">
+    <div>
+      <h1 class="write-title">{post ? "Editar artículo" : "Nuevo artículo"}</h1>
+      <p class="write-subtitle">Escribe, añade imágenes arrastrándolas y publica cuando estés listo.</p>
+    </div>
+  </div>
+
+  {result === 'ok' && slug && (
+    <div class="alert alert--success" role="alert">
+      ✅ Artículo guardado correctamente.
+      <a href={`/blog/${slug}`} class="alert__link" target="_blank" rel="noopener">Ver artículo →</a>
+    </div>
+  )}
+
+  <div id="toast" class="toast">Borrador guardado</div>
+
+  <form method="POST" action={actions.savePost} class="write-form" id="write-form">
+    {post && <input type="hidden" name="id" value={post.id} />}
+
+    <!-- Título -->
+    <div class="field">
+      <label for="post-title" class="field__label">Título</label>
+      <input
+        id="post-title"
+        type="text"
+        name="title"
+        class="field__input field__input--title"
+        placeholder="Un título claro y descriptivo…"
+        required
+        maxlength="200"
+        value={post?.title as string || ''}
+      />
+    </div>
+
+    <!-- Extracto (excerpt) -->
+    <div class="field">
+      <label for="post-excerpt" class="field__label">
+        Extracto <span class="field__optional">(opcional, para SEO y feed)</span>
+      </label>
+      <textarea
+        id="post-excerpt"
+        name="excerpt"
+        class="field__input field__textarea"
+        placeholder="Resumen breve del artículo (máx. 200 caracteres)…"
+        maxlength="200"
+        rows="2"
+      >{post?.excerpt as string || ''}</textarea>
+    </div>
+
+    <!-- Imagen de portada -->
+    <div class="field">
+      <label for="post-cover" class="field__label">
+        URL de imagen de portada <span class="field__optional">(opcional)</span>
+      </label>
+      <input
+        id="post-cover"
+        type="url"
+        name="coverImage"
+        class="field__input"
+        placeholder="https://…"
+        value={post?.coverImage as string || ''}
+      />
+    </div>
+
+    <!-- Etiquetas -->
+    <div class="field">
+      <label class="field__label">Etiquetas</label>
+      <TagSelector client:load initialTags={tags} />
+    </div>
+
+    <!-- Editor WYSIWYG -->
+    <div class="field">
+      <label class="field__label">Contenido</label>
+      <EditorWYSIWYG client:only="react" initialContent={post?.content as string || ''} />
+    </div>
+
+    <!-- Acciones -->
+    <div class="write-actions">
+      <a href="/studio" class="btn btn--ghost">Cancelar</a>
+      <button type="submit" name="status" value="DRAFT" class="btn btn--ghost" id="draft-btn">Guardar Borrador</button>
+      <button type="submit" name="status" value="PUBLISHED" class="btn btn--primary" id="publish-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/>
+        </svg>
+        {post?.status === 'PUBLISHED' ? 'Actualizar artículo' : 'Publicar artículo'}
+      </button>
+    </div>
+
+  </form>
+
+</StudioLayout>
+
+<script>
+  import { actions } from 'astro:actions';
+  
+  const form = document.getElementById('write-form') as HTMLFormElement;
+  const draftBtn = document.getElementById('draft-btn') as HTMLButtonElement;
+  const publishBtn = document.getElementById('publish-btn') as HTMLButtonElement;
+  const toast = document.getElementById('toast');
+  
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    
+    // Identificar qué botón disparó el submit
+    const submitter = (e as SubmitEvent).submitter as HTMLButtonElement;
+    const isDraft = submitter?.value === 'DRAFT';
+    
+    const formData = new FormData(form);
+    formData.set('status', isDraft ? 'DRAFT' : 'PUBLISHED');
+    
+    // Estado de carga en los botones
+    const targetBtn = isDraft ? draftBtn : publishBtn;
+    const originalText = targetBtn.textContent;
+    targetBtn.textContent = isDraft ? 'Guardando...' : 'Publicando...';
+    draftBtn.disabled = true;
+    publishBtn.disabled = true;
+    
+    const { data, error } = await actions.savePost(formData);
+    
+    if (targetBtn) targetBtn.textContent = originalText;
+    draftBtn.disabled = false;
+    publishBtn.disabled = false;
+    
+    if (!error) {
+      if (isDraft) {
+        // Inject ID so subsequent saves update the same draft
+        if (!form.querySelector('input[name="id"]') && data?.postId) {
+          const idInput = document.createElement('input');
+          idInput.type = 'hidden';
+          idInput.name = 'id';
+          idInput.value = data.postId;
+          form.appendChild(idInput);
+          
+          // Update URL without reloading
+          window.history.replaceState(null, '', `?id=${data.postId}`);
+        }
+        
+        toast?.classList.add('show');
+        setTimeout(() => toast?.classList.remove('show'), 3000);
+      } else {
+        // Redirigir mostrando éxito
+        window.location.href = `/studio/escribir?result=ok&slug=${data?.slug}`;
+      }
+    } else {
+      alert(error.message || 'Error al procesar la solicitud');
+    }
+  });
+</script>
+
+<style>
+  .write-header {
+    margin-bottom: 2rem;
+  }
+  .write-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.25rem;
+  }
+  .write-subtitle {
+    color: #6b7280;
+    font-size: 0.9rem;
+  }
+  .alert {
+    padding: 0.85rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .alert--success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .alert__link {
+    color: #166534;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  .write-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    max-width: 860px;
+  }
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .field__label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+  }
+  .field__optional {
+    font-weight: 400;
+    color: #9ca3af;
+  }
+  .field__input {
+    padding: 0.7rem 0.9rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #111827;
+    background: #fff;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .field__input:focus {
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17,24,39,0.08);
+  }
+  .field__input--title {
+    font-size: 1.15rem;
+    font-weight: 600;
+  }
+  .field__textarea { resize: vertical; }
+  .write-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    text-decoration: none;
+    border: none;
+    font-family: inherit;
+  }
+  .btn--primary { background: #111827; color: #fff; }
+  .btn--primary:hover { background: #1f2937; }
+  .btn--primary:active { transform: scale(0.98); }
+  .btn--ghost:hover { background: #f9fafb; }
+  
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: #111827;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 100;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>

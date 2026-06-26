@@ -1,0 +1,68 @@
+---
+// Guardián de rutas: intercepta la cookie antes de renderizar cualquier página admin.
+import '../styles/global.css';
+import { lucia } from '../lib/lucia';
+
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+
+// ─── Validación de sesión ────────────────────────────────────────────────────
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+
+if (!sessionId) {
+  return Astro.redirect('/login');
+}
+
+const { session } = await lucia.validateSession(sessionId);
+
+if (!session) {
+  // Sesión inválida o expirada → limpiar cookie y redirigir
+  const blankCookie = lucia.createBlankSessionCookie();
+  Astro.cookies.set(blankCookie.name, blankCookie.value, blankCookie.attributes);
+  return Astro.redirect('/login');
+}
+
+// Si la sesión fue renovada (fresh), actualizar la cookie
+if (session.fresh) {
+  const refreshedCookie = lucia.createSessionCookie(session.id);
+  Astro.cookies.set(refreshedCookie.name, refreshedCookie.value, refreshedCookie.attributes);
+}
+---
+<!doctype html>
+<html lang="es" class="antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} — Studio Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  </head>
+  <body class="font-sans bg-gray-50 text-gray-900 min-h-screen">
+    <!-- Nav administrador -->
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 px-6">
+      <div class="max-w-7xl mx-auto h-16 flex items-center justify-between">
+        <a href="/studio" class="flex items-center gap-2 font-bold text-lg text-gray-900 hover:text-gray-700 transition-colors">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          MyBlog Studio
+        </a>
+        <div class="flex items-center gap-4">
+          <a href="/studio" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
+          <a href="/studio/escribir" class="text-sm font-semibold bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors">+ Nuevo Post</a>
+          <a href="/" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Ver sitio</a>
+          <form method="POST" action="/api/auth/logout" class="inline-block m-0">
+            <button type="submit" class="text-sm font-medium text-red-600 bg-white border border-red-200 px-4 py-2 rounded-md hover:bg-red-50 transition-colors cursor-pointer">Salir</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-6 md:p-8">
+      <slot />
+    </main>
+  </body>
+</html>
