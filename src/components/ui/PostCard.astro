@@ -1,31 +1,173 @@
 ---
 interface Props {
-  title: string;
-  slug: string;
-  date: Date;
+  title:       string;
+  slug:        string;
+  date:        Date;
+  excerpt?:    string;
+  coverImage?: string;
+  tags?:       string[];
+  readingTime?: number;
+  author?:     string;
 }
-const { title, slug, date } = Astro.props;
+
+const {
+  title,
+  slug,
+  date,
+  excerpt,
+  coverImage,
+  tags        = [],
+  readingTime = 1,
+  author      = 'Admin',
+} = Astro.props;
+
+const formattedDate = date.toLocaleDateString('es-ES', {
+  year:  'numeric',
+  month: 'long',
+  day:   'numeric',
+});
 ---
 <article class="post-card">
-  <h2><a href={`/blog/${slug}`}>{title}</a></h2>
-  <time>{date.toLocaleDateString()}</time>
+  <div class="post-card__body">
+    <!-- Meta: autor + fecha + lectura -->
+    <div class="post-card__meta">
+      <div class="post-card__avatar" aria-hidden="true">
+        {author.charAt(0).toUpperCase()}
+      </div>
+      <span class="post-card__author">{author}</span>
+      <span class="post-card__sep">·</span>
+      <time class="post-card__date" datetime={date.toISOString()}>{formattedDate}</time>
+      <span class="post-card__sep">·</span>
+      <span class="post-card__reading">{readingTime} min de lectura</span>
+    </div>
+
+    <!-- Contenido textual -->
+    <div class="post-card__content">
+      <div class="post-card__text">
+        <h2 class="post-card__title">
+          <a href={`/blog/${slug}`}>{title}</a>
+        </h2>
+        {excerpt && <p class="post-card__excerpt">{excerpt}</p>}
+
+        {tags.length > 0 && (
+          <div class="post-card__tags">
+            {tags.map(tag => (
+              <span class="post-card__tag">{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {coverImage && (
+        <a href={`/blog/${slug}`} class="post-card__thumb">
+          <img src={coverImage} alt={title} loading="lazy" />
+        </a>
+      )}
+    </div>
+  </div>
 </article>
 
 <style>
   .post-card {
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
-    background: white;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding:       1.75rem 0;
+    border-bottom: 1px solid #e6e6e6;
+    transition:    opacity 0.15s;
   }
-  .post-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  .post-card:last-child { border-bottom: none; }
+  .post-card:hover { opacity: 0.88; }
+
+  /* Línea de meta */
+  .post-card__meta {
+    display:     flex;
+    align-items: center;
+    gap:         0.45rem;
+    font-size:   0.82rem;
+    color:       #6b6b6b;
+    margin-bottom: 0.9rem;
+    flex-wrap:   wrap;
   }
-  .post-card h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
-  .post-card a { color: #111; text-decoration: none; }
-  .post-card a:hover { color: #0070f3; }
-  .post-card time { color: #666; font-size: 0.9rem; }
+  .post-card__avatar {
+    width:          22px;
+    height:         22px;
+    border-radius:  50%;
+    background:     #1a1a1a;
+    color:          #fff;
+    font-size:      0.65rem;
+    font-weight:    700;
+    display:        flex;
+    align-items:    center;
+    justify-content: center;
+    flex-shrink:    0;
+  }
+  .post-card__author { font-weight: 600; color: #1a1a1a; }
+  .post-card__sep    { color: #ccc; }
+
+  /* Layout con miniatura opcional a la derecha */
+  .post-card__content {
+    display:     flex;
+    gap:         1.5rem;
+    align-items: flex-start;
+  }
+  .post-card__text { flex: 1; min-width: 0; }
+
+  .post-card__title {
+    font-size:   1.2rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color:       #1a1a1a;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+  .post-card__title a { color: inherit; }
+  .post-card__title a:hover { color: #292929; }
+
+  .post-card__excerpt {
+    font-size:  0.95rem;
+    color:      #6b6b6b;
+    line-height: 1.55;
+    display:    -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow:   hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Etiquetas */
+  .post-card__tags {
+    display:  flex;
+    gap:      0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+  }
+  .post-card__tag {
+    display:       inline-block;
+    font-size:     0.77rem;
+    font-weight:   500;
+    color:         #6b6b6b;
+    background:    #f2f2f2;
+    padding:       0.2rem 0.55rem;
+    border-radius: 999px;
+    transition:    background 0.12s;
+  }
+  .post-card__tag:hover { background: #e6e6e6; }
+
+  /* Miniatura */
+  .post-card__thumb {
+    flex-shrink: 0;
+    width:       112px;
+    height:      75px;
+    border-radius: 4px;
+    overflow:    hidden;
+    display:     block;
+  }
+  .post-card__thumb img {
+    width:   100%;
+    height:  100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 600px) {
+    .post-card__thumb { width: 80px; height: 54px; }
+    .post-card__title { font-size: 1.05rem; }
+  }
 </style>

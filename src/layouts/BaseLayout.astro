@@ -2,77 +2,169 @@
 import '../styles/global.css';
 
 interface Props {
-  title: string;
+  title:       string;
+  description?: string;
+  image?:       string;
+  type?:        'website' | 'article';
 }
-const { title } = Astro.props;
+
+const {
+  title,
+  description = 'Un blog moderno construido con Astro, Turso y React.',
+  image       = '/favicon.svg',
+  type        = 'website',
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? 'http://localhost:4321');
+const ogImage      = image.startsWith('http') ? image : new URL(image, canonicalURL).toString();
 ---
 <!doctype html>
-<html lang="en">
+<html lang="es" style="color-scheme: light;">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{title} | My Blog</title>
-    <style is:global>
-      :root {
-        --text-color: #333;
-        --bg-color: #fafafa;
-        --primary-color: #0070f3;
-      }
-      * { box-sizing: border-box; }
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        color: var(--text-color);
-        background: var(--bg-color);
-        line-height: 1.6;
-      }
-      main {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-      }
-      header {
-        background: #fff;
-        padding: 1rem 0;
-        border-bottom: 1px solid #eaeaea;
-      }
-      header nav {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 0 1rem;
-        display: flex;
-        gap: 1.5rem;
-        align-items: center;
-      }
-      header .logo {
-        font-weight: 800;
-        font-size: 1.25rem;
-        text-decoration: none;
-        color: #111;
-        margin-right: auto;
-      }
-      header a {
-        color: #666;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s;
-      }
-      header a:hover {
-        color: var(--primary-color);
-      }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- SEO primario -->
+    <title>{title} | MyBlog</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type"        content={type} />
+    <meta property="og:url"         content={canonicalURL} />
+    <meta property="og:title"       content={`${title} | MyBlog`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image"       content={ogImage} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content={`${title} | MyBlog`} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image"       content={ogImage} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Fuentes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/" class="logo">MyBlog</a>
-        <a href="/blog">Blog</a>
-        <a href="/admin/login">Admin</a>
-      </nav>
+    <!-- ─── Header / Navegación estilo Medium ─────────────────────────────── -->
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a href="/" class="site-header__brand">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+          <span>MyBlog</span>
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="/blog" class="site-nav__link">Artículos</a>
+          <a href="/login" class="site-nav__cta">Escribir</a>
+        </nav>
+      </div>
     </header>
+
+    <!-- ─── Contenido principal ──────────────────────────────────────────── -->
     <main>
       <slot />
     </main>
+
+    <!-- ─── Footer ──────────────────────────────────────────────────────── -->
+    <footer class="site-footer">
+      <div class="site-footer__inner">
+        <span>© {new Date().getFullYear()} MyBlog</span>
+        <div class="site-footer__links">
+          <a href="/blog">Artículos</a>
+          <a href="/login">Admin</a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>
+
+<style>
+  /* ─── Header ─────────────────────────────────────────────────────────── */
+  .site-header {
+    position:      sticky;
+    top:           0;
+    z-index:       100;
+    background:    rgba(255,255,255,0.95);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid #e6e6e6;
+    padding:       0 1.5rem;
+  }
+  .site-header__inner {
+    max-width:       1192px;
+    margin:          0 auto;
+    height:          57px;
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    gap:             1rem;
+  }
+  .site-header__brand {
+    display:     flex;
+    align-items: center;
+    gap:         0.5rem;
+    font-weight: 800;
+    font-size:   1.15rem;
+    color:       #1a1a1a;
+    letter-spacing: -0.03em;
+  }
+  .site-nav {
+    display:     flex;
+    align-items: center;
+    gap:         0.5rem;
+  }
+  .site-nav__link {
+    font-size:  0.9rem;
+    font-weight: 500;
+    color:      #6b6b6b;
+    padding:    0.4rem 0.75rem;
+    border-radius: 999px;
+    transition: color 0.15s, background 0.15s;
+  }
+  .site-nav__link:hover { color: #1a1a1a; background: #f2f2f2; }
+  .site-nav__cta {
+    font-size:     0.9rem;
+    font-weight:   600;
+    color:         #ffffff;
+    background:    #1a1a1a;
+    padding:       0.45rem 1rem;
+    border-radius: 999px;
+    transition:    background 0.15s;
+  }
+  .site-nav__cta:hover { background: #292929; }
+
+  /* ─── Footer ─────────────────────────────────────────────────────────── */
+  .site-footer {
+    border-top: 1px solid #e6e6e6;
+    padding:    1.5rem;
+    margin-top: 4rem;
+  }
+  .site-footer__inner {
+    max-width:       1192px;
+    margin:          0 auto;
+    display:         flex;
+    align-items:     center;
+    justify-content: space-between;
+    font-size:       0.83rem;
+    color:           #6b6b6b;
+    gap:             1rem;
+  }
+  .site-footer__links {
+    display: flex;
+    gap:     1.25rem;
+  }
+  .site-footer__links a { color: #6b6b6b; transition: color 0.15s; }
+  .site-footer__links a:hover { color: #1a1a1a; }
+</style>
