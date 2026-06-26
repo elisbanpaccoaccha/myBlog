@@ -143,6 +143,47 @@ export const postActions = {
     },
   }),
 
+  /** Duplica un post existente como borrador */
+  duplicatePost: defineAction({
+    input: z.object({ id: z.string() }),
+    handler: async (input, context) => {
+      const sessionId = context.cookies.get(lucia.sessionCookieName)?.value;
+      if (!sessionId) throw new ActionError({ code: 'UNAUTHORIZED' });
+      const { session, user } = await lucia.validateSession(sessionId);
+      if (!session || !user) throw new ActionError({ code: 'UNAUTHORIZED' });
+
+      const [originalPost] = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.id, input.id))
+        .limit(1);
+
+      if (!originalPost) throw new ActionError({ code: 'NOT_FOUND', message: 'Post no encontrado' });
+
+      const newId = `post-${randomBytes(8).toString('hex')}`;
+      const newTitle = `Copia de ${originalPost.title}`;
+      const now = new Date().toISOString();
+
+      try {
+        await db.insert(posts).values({
+          ...originalPost,
+          id: newId,
+          title: newTitle,
+          slug: `draft-${newId}`,
+          status: 'DRAFT',
+          published: 0,
+          publishedAt: null,
+          createdAt: now,
+          updatedAt: now,
+        });
+
+        return { success: true, newId };
+      } catch (e: any) {
+        throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: e.message || 'Error de BD' });
+      }
+    },
+  }),
+
   /** Obtiene todos los posts del autor autenticado */
   getPosts: defineAction({
     handler: async (_, context) => {
@@ -179,7 +220,7 @@ export const postActions = {
         createdAt:   row.createdAt,
         updatedAt:   row.updatedAt,
       }));
-      console.log("SERVER getPosts output:", JSON.stringify(mapped, null, 2));
+      // console.log("SERVER getPosts output:", JSON.stringify(mapped, null, 2));
       return mapped;
     },
   }),
