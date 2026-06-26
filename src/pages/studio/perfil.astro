@@ -1,0 +1,192 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import { lucia } from '../../lib/lucia';
+import { db } from '../../db/client';
+import { users as usersTable } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+import { actions } from 'astro:actions';
+
+// Verificar sesión
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) {
+  return Astro.redirect('/login');
+}
+const { user } = await lucia.validateSession(sessionId);
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+// Hydration: Cargar datos actuales del usuario
+const dbUser = await db.select().from(usersTable).where(eq(usersTable.id, user.id)).limit(1).then(res => res[0]);
+
+const initialName = dbUser?.displayName || '';
+const initialBio = dbUser?.bio || '';
+const initialAvatar = dbUser?.avatarUrl || '';
+---
+
+<StudioLayout title="Configuración de Perfil">
+  <div class="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <h1 class="text-4xl font-bold text-slate-900 mb-10">Configuración</h1>
+
+    <div id="toast" class="fixed bottom-8 right-8 bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-medium opacity-0 translate-y-4 pointer-events-none transition-all duration-300 z-50 shadow-lg">
+      Perfil actualizado correctamente
+    </div>
+
+    <form method="POST" action={actions.saveProfile} id="profile-form" class="space-y-2">
+      <!-- Fila 1: Nombre -->
+      <div class="py-6 border-b border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div class="md:col-span-1">
+          <h2 class="text-sm font-medium text-slate-900">Nombre a mostrar</h2>
+          <p class="text-sm text-slate-500 mt-1">El nombre principal que el público verá en tu blog.</p>
+        </div>
+        <div class="md:col-span-2">
+          <input 
+            type="text" 
+            name="displayName"
+            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+            placeholder="Ej. Jane Doe"
+            value={initialName}
+          />
+        </div>
+      </div>
+
+      <!-- Fila 2: Biografía -->
+      <div class="py-6 border-b border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div class="md:col-span-1">
+          <h2 class="text-sm font-medium text-slate-900">Biografía</h2>
+          <p class="text-sm text-slate-500 mt-1">Aparecerá al final de tus artículos.</p>
+        </div>
+        <div class="md:col-span-2">
+          <textarea 
+            name="bio"
+            rows="3"
+            maxlength="160"
+            class="w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 resize-none"
+            placeholder="Cuéntanos sobre ti..."
+          >{initialBio}</textarea>
+          <div class="flex justify-end w-full mt-1">
+            <span class="text-xs text-slate-400">Máx 160 caracteres</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fila 3: Avatar -->
+      <div class="py-6 border-b border-slate-200 grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+        <div class="md:col-span-1">
+          <h2 class="text-sm font-medium text-slate-900">Foto de perfil</h2>
+          <p class="text-sm text-slate-500 mt-1">Una imagen clara de tu rostro.</p>
+        </div>
+        <div class="md:col-span-2 flex items-center gap-4">
+          <div id="avatar-preview" class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-xl border border-slate-200 overflow-hidden">
+            {initialAvatar ? (
+              <img src={initialAvatar} alt="Avatar" class="w-full h-full object-cover" />
+            ) : (
+              (initialName ? initialName.charAt(0).toUpperCase() : 'A')
+            )}
+          </div>
+          <input type="hidden" name="avatarUrl" id="avatarUrl-input" value={initialAvatar} />
+          <input type="file" id="avatar-upload" accept="image/*" class="hidden" />
+          <button type="button" id="change-avatar-btn" class="text-sm font-medium text-slate-600 hover:text-slate-900 bg-white border border-slate-300 hover:border-slate-400 rounded-md px-4 py-2 transition-colors cursor-pointer shadow-sm">
+            Cambiar foto
+          </button>
+        </div>
+      </div>
+      
+      <!-- Fila de Acción (Guardar) -->
+      <div class="mt-6 flex justify-end">
+        <button type="submit" id="save-btn" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2 rounded-md font-medium text-sm transition-colors cursor-pointer shadow-sm flex items-center justify-center min-w-[140px]">
+          Guardar perfil
+        </button>
+      </div>
+    </form>
+
+    <!-- Zona de Peligro (Danger Zone) -->
+    <div class="mt-16">
+      <h2 class="text-xl font-bold text-red-900 mb-4">Zona de Peligro</h2>
+      <div class="border border-red-200 rounded-lg p-6 bg-red-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h3 class="text-sm font-semibold text-slate-900">Eliminar cuenta</h3>
+          <p class="text-sm text-slate-500 mt-1">Eliminar permanentemente tu cuenta y borrar todos tus artículos sin posibilidad de recuperación.</p>
+        </div>
+        <button class="text-red-600 hover:text-red-700 font-medium text-sm bg-white border border-red-200 hover:border-red-300 px-4 py-2 rounded-md transition-colors whitespace-nowrap cursor-pointer shadow-sm">
+          Eliminar cuenta
+        </button>
+      </div>
+    </div>
+  </div>
+</StudioLayout>
+
+<script>
+  import { actions } from 'astro:actions';
+  
+  const form = document.getElementById('profile-form') as HTMLFormElement;
+  const saveBtn = document.getElementById('save-btn') as HTMLButtonElement;
+  const toast = document.getElementById('toast');
+  const uploadInput = document.getElementById('avatar-upload') as HTMLInputElement;
+  const avatarBtn = document.getElementById('change-avatar-btn') as HTMLButtonElement;
+  const avatarPreview = document.getElementById('avatar-preview') as HTMLDivElement;
+  const avatarUrlInput = document.getElementById('avatarUrl-input') as HTMLInputElement;
+  
+  avatarBtn?.addEventListener('click', () => {
+    uploadInput?.click();
+  });
+
+  uploadInput?.addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    avatarBtn.textContent = 'Subiendo...';
+    avatarBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) throw new Error('Error al subir');
+      const { url } = await res.json();
+      
+      avatarUrlInput.value = url;
+      avatarPreview.innerHTML = `<img src="${url}" alt="Avatar" class="w-full h-full object-cover" />`;
+    } catch (err) {
+      alert('Error al subir la imagen');
+    } finally {
+      avatarBtn.textContent = 'Cambiar foto';
+      avatarBtn.disabled = false;
+    }
+  });
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    
+    const formData = new FormData(form);
+    
+    // Loading state
+    const originalText = saveBtn.textContent;
+    if (saveBtn) {
+      saveBtn.textContent = 'Guardando...';
+      saveBtn.disabled = true;
+      saveBtn.classList.add('opacity-75', 'cursor-not-allowed');
+    }
+    
+    const { error } = await actions.saveProfile(formData);
+    
+    // Reset state
+    if (saveBtn) {
+      saveBtn.textContent = originalText || 'Guardar perfil';
+      saveBtn.disabled = false;
+      saveBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+    
+    if (!error) {
+      // Feedback visual (Toast)
+      toast?.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+      setTimeout(() => {
+        toast?.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+      }, 3000);
+    } else {
+      alert(error.message || 'Error al guardar el perfil');
+    }
+  });
+</script>
