@@ -48,12 +48,6 @@ const posts = rows.map(row => ({
       <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
       <p class="text-gray-500 text-sm mt-1">Gestiona tus artículos publicados y borradores.</p>
     </div>
-    <a href="/studio/escribir" class="inline-flex items-center gap-2 bg-slate-900 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-slate-800 transition-colors">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-      Nuevo artículo
-    </a>
   </div>
 
   <DashboardList client:load initialPosts={posts} />
