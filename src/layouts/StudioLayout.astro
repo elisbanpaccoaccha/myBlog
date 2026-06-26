@@ -50,13 +50,19 @@ if (session.fresh) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
           MyBlog Studio
         </a>
-        <div class="flex items-center gap-4">
-          <a href="/studio" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Dashboard</a>
-          <!-- <a href="/studio/escribir" class="text-sm font-semibold bg-slate-900 text-white px-4 py-2 rounded-md hover:bg-slate-800 transition-colors">+ Nuevo Post</a> -->
-          <a href="/" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Ver sitio</a>
-          <form method="POST" action="/api/auth/logout" class="inline-block m-0">
-            <button type="submit" class="text-sm font-medium text-red-600 bg-white border border-red-200 px-4 py-2 rounded-md hover:bg-red-50 transition-colors cursor-pointer">Salir</button>
-          </form>
+        <div class="flex items-center gap-5">
+          <a href="/studio" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Panel</a>
+          <a href="/" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Ver sitio</a>
+          
+          {/* Perfil de Usuario */}
+          <div class="flex items-center gap-3 ml-2 border-l border-gray-200 pl-6">
+            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-bold text-sm">
+              A
+            </div>
+            <form method="POST" action="/api/auth/logout" class="inline-block m-0">
+              <button type="submit" class="text-sm font-medium text-slate-500 hover:text-red-600 transition-colors cursor-pointer bg-transparent border-none p-0">Cerrar sesión</button>
+            </form>
+          </div>
         </div>
       </div>
     </nav>
