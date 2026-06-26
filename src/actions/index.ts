@@ -3,5 +3,5 @@ import { postActions } from './posts';
 
 export const server = {
   ...authActions,
-  ...postActions
+  ...postActions,
 };
