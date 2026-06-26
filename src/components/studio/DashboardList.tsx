@@ -130,7 +130,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
   return (
     <>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col justify-between shadow-sm">
           <div className="flex justify-between items-start mb-2">
             <span className="text-[15px] font-medium text-gray-800">Total Posts</span>
@@ -182,7 +182,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
               placeholder="Buscar" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 border border-gray-300 rounded-md text-sm w-full outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-shadow" 
+              className="pl-9 pr-4 h-10 border border-gray-300 rounded-lg text-sm w-full outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 transition-shadow" 
             />
           </div>
           
@@ -191,7 +191,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
             <select 
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none pl-4 pr-10 py-2 border border-gray-300 rounded-md text-sm outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white cursor-pointer transition-shadow w-full"
+              className="appearance-none pl-4 pr-10 h-10 border border-gray-300 rounded-lg text-sm outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900 bg-white cursor-pointer transition-shadow w-full"
             >
               <option value="ALL">Estados</option>
               <option value="PUBLISHED">Publicados</option>
@@ -201,7 +201,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
           </div>
 
           {/* CTA Botón Principal */}
-          <a href="/studio/escribir" className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-md font-medium text-sm transition-colors flex items-center justify-center gap-2 shrink-0">
+          <a href="/studio/escribir" className="bg-slate-900 hover:bg-slate-800 text-white px-4 h-10 rounded-lg font-medium text-sm transition-colors flex items-center justify-center gap-2 shrink-0">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
             Nuevo Artículo
           </a>
