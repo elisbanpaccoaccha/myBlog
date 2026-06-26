@@ -1,18 +1,33 @@
 import { Lucia } from 'lucia';
-// Typically you'd setup the turso adapter here. 
-// import { LibSQLAdapter } from '@lucia-auth/adapter-sqlite';
-// For now, this is a placeholder since we're using astro:db
+import { LibSQLAdapter } from '@lucia-auth/adapter-sqlite';
+import { libsqlClient } from '../db/client.ts';
 
-export const lucia = new Lucia({} as any, {
+// En producción, apunta a Turso mediante las variables de entorno.
+const isProduction = import.meta.env.MODE === 'production';
+
+const adapter = new LibSQLAdapter(libsqlClient, {
+  user:    'Users',
+  session: 'Sessions',
+});
+
+export const lucia = new Lucia(adapter, {
   sessionCookie: {
     attributes: {
-      secure: process.env.NODE_ENV === 'production',
-    }
-  }
+      secure:   isProduction,     // HTTPS en producción
+      sameSite: 'lax' as const,
+    },
+  },
+  getUserAttributes(attributes) {
+    return {
+      username: (attributes as { username: string }).username,
+      role: (attributes as { role: string }).role,
+    };
+  },
 });
 
 declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia;
+    DatabaseUserAttributes: { username: string; role: string };
   }
 }
