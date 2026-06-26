@@ -25,11 +25,14 @@ interface Post {
 
 const formatPostDateTime = (dateStr: string | null) => {
   if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
-    return 'Reciente';
+    return { date: 'Reciente', time: '' };
   }
   const d = new Date(dateStr);
-  if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return 'Reciente';
-  return d.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).replace(',', '');
+  if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return { date: 'Reciente', time: '' };
+  
+  const date = d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' }).replace(',', '');
+  const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  return { date, time };
 };
 
 // Fetcher usando Astro Actions
@@ -74,7 +77,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
   return (
     <>
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl p-5 flex flex-col justify-between shadow-sm">
           <div className="flex justify-between items-start mb-2">
             <span className="text-[15px] font-medium text-gray-800">Total Posts</span>
@@ -134,87 +137,112 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
           </div>
         </div>
 
-        {/* Table Header */}
-        <div className="hidden lg:grid grid-cols-12 bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-700 p-4">
-          <div className="col-span-5">Título del Post</div>
-          <div className="col-span-1">Estado</div>
-          <div className="col-span-2">Última Modificación</div>
-          <div className="col-span-2">Estadísticas</div>
-          <div className="col-span-2">Acciones</div>
-        </div>
-
-        {/* Table Body */}
-        <div className="divide-y divide-gray-100">
-          {error && <div className="p-8 text-center text-red-500">Error al cargar los artículos.</div>}
-          {posts.length === 0 && !error && (
-            <div className="p-12 text-center text-gray-500">
-              <p>Aún no has escrito ningún artículo.</p>
-              <a href="/studio/escribir" className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline">Escribe el primero</a>
-            </div>
-          )}
-          
-          {posts.map(post => {
-            const isDraft = post.status === 'DRAFT';
-            return (
-              <div key={post.id} className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-0 items-center p-4 hover:bg-gray-50 transition-colors">
-                
-                {/* Título */}
-                <div className="col-span-5 pr-4 overflow-hidden">
-                  <a href={`/blog/${post.slug}`} className="block font-semibold text-[15px] text-gray-900 hover:underline truncate" target="_blank" rel="noopener noreferrer">
-                    {post.title}
-                  </a>
-                  {/* <p className="text-[13px] text-gray-500 truncate mt-0.5">
-                    {post.status === 'DRAFT' ? `Borrador ${post.readingTime} min` : `Publicado ${post.readingTime} min`} — Última mod: {formatPostDate(post.updatedAt || post.createdAt)}
-                  </p> */}
-                </div>
-
-                {/* Estado */}
-                <div className="col-span-1">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-[13px] font-medium leading-none ${isDraft ? 'bg-gray-500 text-white' : 'bg-emerald-600 text-white'}`}>
-                    {isDraft ? 'Draft' : 'Published'}
-                  </span>
-                </div>
-
-                {/* Última Modificación */}
-                <div className="col-span-2 text-[14px] text-gray-700">
-                  {formatPostDateTime(post.updatedAt || post.createdAt)}
-                </div>
-
-                {/* Estadísticas */}
-                <div className="col-span-2 flex items-center gap-4 text-gray-600">
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-1 text-[13px]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 0</div>
-                    <span className="text-[11px] text-gray-400">Views: 0</span>
+        {/* Contenedor Elástico de la Tabla */}
+        <div className="w-full overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200 text-sm font-semibold text-gray-700">
+                <th className="p-4 w-full">Título</th>
+                <th className="p-4 text-center whitespace-nowrap">Estado</th>
+                <th className="p-4 leading-tight whitespace-nowrap">
+                  <div className="flex flex-col">
+                    <span>Última</span>
+                    <span>Modificación</span>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-1 text-[13px]"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> 0</div>
-                    <span className="text-[11px] text-gray-400">Reads: 0</span>
-                  </div>
-                  <button className="text-gray-400 hover:text-gray-600"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
-                </div>
+                </th>
+                <th className="p-4 text-center whitespace-nowrap">Métricas</th>
+                <th className="p-4 text-right whitespace-nowrap">Acciones</th>
+              </tr>
+            </thead>
+            
+            <tbody className="divide-y divide-gray-100">
+              {error && <tr><td colSpan={5} className="p-8 text-center text-red-500">Error al cargar los artículos.</td></tr>}
+              {posts.length === 0 && !error && (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-gray-500">
+                    <p>Aún no has escrito ningún artículo.</p>
+                    <a href="/studio/escribir" className="inline-block mt-4 text-sm font-semibold text-blue-600 hover:underline">Escribe el primero</a>
+                  </td>
+                </tr>
+              )}
+              
+              {posts.map(post => {
+                const isDraft = post.status === 'DRAFT';
+                return (
+                  <tr key={post.id} className="hover:bg-gray-50 transition-colors h-[72px]">
+                    
+                    {/* Título */}
+                    <td className="p-4 w-full align-middle">
+                      <div className="max-w-[220px] sm:max-w-xs md:max-w-sm lg:max-w-md">
+                        <a href={`/studio/escribir?id=${post.id}`} className="font-semibold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer line-clamp-2" title={post.title}>
+                          {post.title}
+                        </a>
+                      </div>
+                    </td>
 
-                {/* Acciones */}
-                <div className="col-span-2 flex items-center gap-4 text-gray-600 text-sm">
-                  <a href={`/blog/${post.slug}`} className="flex flex-col items-center gap-1 hover:text-gray-900 transition-colors group" target="_blank" rel="noopener noreferrer">
-                    <div className="p-1.5 rounded-md group-hover:bg-gray-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-                    <span className="text-[11px]">Ver</span>
-                  </a>
-                  <a href={`/studio/escribir?id=${post.id}`} className="flex flex-col items-center gap-1 hover:text-gray-900 transition-colors group">
-                    <div className="p-1.5 rounded-md group-hover:bg-gray-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-                    <span className="text-[11px]">Editar</span>
-                  </a>
-                  <button type="button" className="flex flex-col items-center gap-1 hover:text-gray-900 transition-colors group">
-                    <div className="p-1.5 rounded-md group-hover:bg-gray-100"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></div>
-                    <span className="text-[11px]">Duplicar</span>
-                  </button>
-                  <button type="button" onClick={() => handleDelete(post.id, post.title)} className="flex flex-col items-center gap-1 hover:text-red-600 transition-colors group">
-                    <div className="p-1.5 rounded-md group-hover:bg-red-50"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg></div>
-                    <span className="text-[11px]">Eliminar</span>
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                    {/* Estado */}
+                    <td className="p-4 text-center whitespace-nowrap align-middle">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium leading-none ${isDraft ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+                        {isDraft ? 'Borrador' : 'Publicado'}
+                      </span>
+                    </td>
+
+                    {/* Última Modificación */}
+                    <td className="p-4 whitespace-nowrap align-middle">
+                      {(() => {
+                        const { date, time } = formatPostDateTime(post.updatedAt || post.createdAt);
+                        return (
+                          <div className="flex flex-col">
+                            <span className="text-[13.5px] font-medium text-slate-700">{date}</span>
+                            {time && <span className="text-[12.5px] text-slate-500">{time}</span>}
+                          </div>
+                        );
+                      })()}
+                    </td>
+
+                    {/* Métricas */}
+                    <td className="p-4 text-center text-sm text-slate-500 whitespace-nowrap align-middle">
+                      <div className="flex items-center justify-center gap-4 font-medium">
+                        <div className="flex items-center gap-1.5" title="Vistas">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                          <span>0</span>
+                        </div>
+                        <div className="flex items-center gap-1.5" title="Lecturas">
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                          <span>0</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Acciones */}
+                    <td className="p-4 whitespace-nowrap align-middle">
+                      <div className="flex items-center justify-end gap-3 text-gray-500">
+                        {!isDraft && (
+                          <>
+                            <button className="p-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors" title="Compartir">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                            </button>
+                            <a href={`/blog/${post.slug}`} className="p-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors" title="Ver en el blog" target="_blank" rel="noopener noreferrer">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </a>
+                          </>
+                        )}
+                        <a href={`/studio/escribir?id=${post.id}`} className="p-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors" title="Editar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </a>
+                        <button type="button" className="p-1.5 rounded-md hover:bg-gray-100 hover:text-gray-900 transition-colors" title="Duplicar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                        <button type="button" onClick={() => handleDelete(post.id, post.title)} className="p-1.5 rounded-md hover:bg-red-50 hover:text-red-600 transition-colors" title="Eliminar">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
     </>
