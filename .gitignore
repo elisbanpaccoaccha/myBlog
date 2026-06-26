@@ -65,21 +65,28 @@ coverage/
 .nx/
 
 
-# Local and production secrets files
+# Local and production secrets files / Environment variables
 .env
 .env.local
+.env.development
 .env.development.local
+.env.test
 .env.test.local
-.env.production.local
-.env.*.local
-*.env
-.env.backup
 .env.production
+.env.production.local
+.env.staging
+.env.staging.local
+.env.preview
+.env.preview.local
+.env.*
+*.env
+*.env.local
+.env.backup
 
 # DO NOT ignore the configuration template
 !.env.example
 
-# Credentials, tokens and certificates
+# Credentials, tokens, keys and certificates
 *.pem
 *.key
 *.pub
@@ -89,6 +96,8 @@ credentials.json
 .aws/
 .gcloud/
 sftp.json
+.npmrc
+.yarnrc
 
 
 # Media upload directories for local development (R2/S3 local emulation or disk drivers)
