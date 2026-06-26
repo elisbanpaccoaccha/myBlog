@@ -14,14 +14,14 @@ interface Post {
   updatedAt: string | null;
 }
 
-const formatPostDate = (dateStr: string | null) => {
-  if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
-    return 'Reciente';
-  }
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return 'Reciente';
-  return d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric'});
-};
+// const formatPostDate = (dateStr: string | null) => {
+//   if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
+//     return 'Reciente';
+//   }
+//   const d = new Date(dateStr);
+//   if (isNaN(d.getTime()) || d.getFullYear() <= 1970) return 'Reciente';
+//   return d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric'});
+// };
 
 const formatPostDateTime = (dateStr: string | null) => {
   if (!dateStr || dateStr === 'null' || dateStr === 'undefined') {
@@ -163,9 +163,9 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
                   <a href={`/blog/${post.slug}`} className="block font-semibold text-[15px] text-gray-900 hover:underline truncate" target="_blank" rel="noopener noreferrer">
                     {post.title}
                   </a>
-                  <p className="text-[13px] text-gray-500 truncate mt-0.5">
+                  {/* <p className="text-[13px] text-gray-500 truncate mt-0.5">
                     {post.status === 'DRAFT' ? `Borrador ${post.readingTime} min` : `Publicado ${post.readingTime} min`} — Última mod: {formatPostDate(post.updatedAt || post.createdAt)}
-                  </p>
+                  </p> */}
                 </div>
 
                 {/* Estado */}
