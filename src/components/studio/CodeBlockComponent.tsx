@@ -11,14 +11,40 @@ export default function CodeBlockComponent({ node, updateAttributes, extension }
         onChange={event => updateAttributes({ language: event.target.value })}
       >
         <option value="null">auto</option>
-        <option value="javascript">JavaScript</option>
-        <option value="typescript">TypeScript</option>
-        <option value="html">HTML</option>
-        <option value="css">CSS</option>
-        <option value="python">Python</option>
         <option value="bash">Bash</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="csharp">C#</option>
+        <option value="css">CSS</option>
+        <option value="diff">Diff</option>
+        <option value="go">Go</option>
+        <option value="graphql">GraphQL</option>
+        <option value="ini">INI</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
         <option value="json">JSON</option>
+        <option value="kotlin">Kotlin</option>
+        <option value="less">Less</option>
+        <option value="lua">Lua</option>
+        <option value="makefile">Makefile</option>
+        <option value="markdown">Markdown</option>
+        <option value="objectivec">Objective-C</option>
+        <option value="perl">Perl</option>
+        <option value="php">PHP</option>
+        <option value="plaintext">Plain Text</option>
+        <option value="python">Python</option>
+        <option value="r">R</option>
+        <option value="ruby">Ruby</option>
+        <option value="rust">Rust</option>
+        <option value="scss">SCSS</option>
+        <option value="shell">Shell</option>
         <option value="sql">SQL</option>
+        <option value="swift">Swift</option>
+        <option value="typescript">TypeScript</option>
+        <option value="vbnet">VB.NET</option>
+        <option value="wasm">WebAssembly</option>
+        <option value="xml">XML / HTML</option>
+        <option value="yaml">YAML</option>
       </select>
       <pre className="!mt-0 !mb-0 bg-slate-900 rounded-xl p-4 overflow-x-auto border border-slate-800">
         <NodeViewContent as="code" className="font-mono text-sm text-slate-50" />
