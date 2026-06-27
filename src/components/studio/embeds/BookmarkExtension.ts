@@ -6,6 +6,7 @@ export const BookmarkEmbed = Node.create({
   name: 'bookmarkEmbed',
   group: 'block',
   atom: true,
+  draggable: true,
 
   addAttributes() {
     return {

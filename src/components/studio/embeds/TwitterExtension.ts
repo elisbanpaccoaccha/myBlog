@@ -6,6 +6,7 @@ export const TwitterEmbed = Node.create({
   name: 'twitterEmbed',
   group: 'block',
   atom: true,
+  draggable: true,
 
   addAttributes() {
     return {

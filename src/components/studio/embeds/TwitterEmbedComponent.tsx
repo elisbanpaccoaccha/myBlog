@@ -1,11 +1,15 @@
 import React from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
+import { GripVertical } from 'lucide-react';
 import { Tweet } from 'react-tweet';
 
 export default function TwitterEmbedComponent({ node }: any) {
   return (
-    <NodeViewWrapper className="twitter-embed my-6 flex justify-center w-full" contentEditable={false}>
-      <div className="w-full max-w-lg" data-theme="light">
+    <NodeViewWrapper className="twitter-embed my-6 flex justify-center w-full relative group" contentEditable={false}>
+      <div data-drag-handle className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-600 p-1 z-10">
+        <GripVertical size={20} />
+      </div>
+      <div draggable={false} className="w-full max-w-lg" data-theme="light">
         <Tweet id={node.attrs.tweetId} />
       </div>
     </NodeViewWrapper>

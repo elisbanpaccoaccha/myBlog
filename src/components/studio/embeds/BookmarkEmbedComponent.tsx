@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
+import { GripVertical } from 'lucide-react';
 
 export default function BookmarkEmbedComponent({ node, updateAttributes }: any) {
   const { url, title, description, image, domain, isLoaded } = node.attrs;
@@ -28,14 +29,17 @@ export default function BookmarkEmbedComponent({ node, updateAttributes }: any) 
   }, [url, isLoaded, updateAttributes]);
 
   return (
-    <NodeViewWrapper className="bookmark-embed my-6 w-full" contentEditable={false}>
+    <NodeViewWrapper className="bookmark-embed my-6 w-full relative group" contentEditable={false}>
+      <div data-drag-handle className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-600 p-1 z-10">
+        <GripVertical size={20} />
+      </div>
       {loading ? (
         <div className="border border-slate-200 rounded-md p-4 animate-pulse bg-white">
           <div className="h-4 bg-slate-200 rounded w-3/4 mb-4"></div>
           <div className="h-4 bg-slate-200 rounded w-1/2"></div>
         </div>
       ) : (
-        <a href={url} target="_blank" rel="noopener noreferrer" className="block border border-slate-200 rounded-md overflow-hidden hover:bg-slate-50 transition-colors no-underline text-slate-900 flex flex-col sm:flex-row bg-white">
+        <a draggable={false} href={url} target="_blank" rel="noopener noreferrer" className="block border border-slate-200 rounded-md overflow-hidden hover:bg-slate-50 transition-colors no-underline text-slate-900 flex flex-col sm:flex-row bg-white">
           <div className="p-4 flex flex-col justify-center flex-1">
             <h3 className="font-bold text-lg mb-1 leading-tight line-clamp-1">{title || url}</h3>
             {description && <p className="text-sm text-slate-500 line-clamp-2 mb-2">{description}</p>}

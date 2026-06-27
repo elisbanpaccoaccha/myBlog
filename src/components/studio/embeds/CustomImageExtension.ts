@@ -3,6 +3,7 @@ import { ReactNodeViewRenderer } from '@tiptap/react';
 import ImageNodeView from './ImageNodeView';
 
 export const CustomImage = Image.extend({
+  draggable: true,
   addAttributes() {
     return {
       ...this.parent?.(),

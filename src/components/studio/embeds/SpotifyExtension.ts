@@ -6,6 +6,7 @@ export const SpotifyEmbed = Node.create({
   name: 'spotifyEmbed',
   group: 'block',
   atom: true,
+  draggable: true,
 
   addAttributes() {
     return {

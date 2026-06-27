@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
+import { GripVertical } from 'lucide-react';
 
 export default function ImageNodeView({ node, updateAttributes, selected }: any) {
   const containerRef = useRef<HTMLFigureElement>(null);
@@ -45,7 +46,10 @@ export default function ImageNodeView({ node, updateAttributes, selected }: any)
   const isFull = node.attrs.align === 'full';
 
   return (
-    <NodeViewWrapper className={`my-8 flex flex-col custom-image-node ${alignClass}`}>
+    <NodeViewWrapper className={`my-8 flex flex-col custom-image-node group relative ${alignClass}`}>
+      <div contentEditable={false} data-drag-handle className="absolute -left-10 top-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-600 p-1 z-10">
+        <GripVertical size={20} />
+      </div>
       <figure 
         ref={containerRef}
         className="relative group"
@@ -54,6 +58,7 @@ export default function ImageNodeView({ node, updateAttributes, selected }: any)
         <img 
           src={node.attrs.src} 
           alt={node.attrs.alt || ''} 
+          draggable={false}
           className={`rounded-lg max-w-full block transition-shadow duration-200 ${selected ? 'ring-2 ring-emerald-500' : ''}`}
           style={{ width: '100%', height: 'auto' }}
         />
