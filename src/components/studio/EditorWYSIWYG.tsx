@@ -14,6 +14,7 @@ import CodeBlockComponent from './CodeBlockComponent';
 import { TwitterEmbed } from './embeds/TwitterExtension';
 import { SpotifyEmbed } from './embeds/SpotifyExtension';
 import { BookmarkEmbed } from './embeds/BookmarkExtension';
+import { CustomImage } from './embeds/CustomImageExtension';
 
 const lowlight = createLowlight(common);
 import {
@@ -23,7 +24,11 @@ import {
   Code,
   Braces,
   MoreHorizontal,
-  Plus
+  Plus,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Maximize2
 } from 'lucide-react';
 
 interface Props {
@@ -37,6 +42,8 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
   const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState('');
+  const [isAltPopoverOpen, setIsAltPopoverOpen] = useState(false);
+  const [altText, setAltText] = useState('');
   const [isEmbedPopoverOpen, setIsEmbedPopoverOpen] = useState(false);
   const [embedUrl, setEmbedUrl] = useState('');
 
@@ -55,7 +62,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
       TwitterEmbed,
       SpotifyEmbed,
       BookmarkEmbed,
-      Image.configure({ inline: false, allowBase64: false }),
+      CustomImage,
       Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Cuenta tu historia...' }),
       Youtube.configure({
@@ -88,7 +95,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       if (!res.ok) throw new Error('Upload fallido');
       const { url } = (await res.json()) as { url: string };
-      editor.chain().focus().setImage({ src: url, alt: file.name }).run();
+      (editor.chain().focus() as any).setCustomImage({ src: url, alt: file.name }).run();
     } catch (err) {
       console.error('[EditorWYSIWYG] Upload error:', err);
     }
@@ -184,9 +191,14 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
         multiple
       />
 
-      {/* ─── Bubble Menu (Menú de formato estilo Medium) ────────────── */}
+      {/* ─── General Bubble Menu ─────────────────────────────── */}
       {editor && (
-        <BubbleMenu editor={editor} className="bubble-menu">
+        <BubbleMenu editor={editor} pluginKey="generalBubbleMenu" tippyOptions={{ duration: 100 }} className="bubble-menu flex items-center bg-[#262625] rounded-md shadow-lg p-1 overflow-hidden" shouldShow={({ editor, view, state, from, to }) => {
+          if (editor.isActive('image')) return false;
+          const { empty } = state.selection;
+          const hasText = view.state.doc.textBetween(from, to, ' ').length > 0;
+          return !empty && hasText;
+        }}>
           {isLinkPopoverOpen ? (
             <div className="flex items-center gap-2 px-2 py-1">
               <input
@@ -283,6 +295,84 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
                 title="Cita"
               >
                 <span style={{ fontFamily: 'serif', fontSize: '1.2rem', lineHeight: 1 }}>”</span>
+              </button>
+            </>
+          )}
+        </BubbleMenu>
+      )}
+
+      {/* ─── Image Bubble Menu (estilo Medium) ───────────────────────── */}
+      {editor && (
+        <BubbleMenu 
+          editor={editor} 
+          pluginKey="imageBubbleMenu"
+          shouldShow={({ editor }) => editor.isActive('image')}
+          className="bg-[#262625] text-white rounded-md flex items-center shadow-lg z-40 p-1 gap-1"
+          tippyOptions={{ placement: 'top', duration: 100 }}
+        >
+          {isAltPopoverOpen ? (
+            <div className="flex items-center gap-2 px-2 py-1">
+              <input
+                type="text"
+                placeholder="Texto alternativo (SEO)..."
+                value={altText}
+                onChange={(e) => setAltText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                     e.preventDefault();
+                     editor.commands.updateAttributes('image', { alt: altText });
+                     setIsAltPopoverOpen(false);
+                  }
+                  if (e.key === 'Escape') setIsAltPopoverOpen(false);
+                }}
+                className="bg-transparent text-white border-b border-emerald-500 focus:border-emerald-400 outline-none text-sm px-1 py-0.5 w-48"
+                autoFocus
+              />
+              <button 
+                type="button" 
+                onClick={() => { editor.commands.updateAttributes('image', { alt: altText }); setIsAltPopoverOpen(false); }} 
+                className="text-emerald-500 hover:text-emerald-400 font-bold px-1"
+              >
+                ✓
+              </button>
+            </div>
+          ) : (
+            <>
+              <button 
+                type="button" 
+                onMouseDown={(e) => e.preventDefault()} 
+                onClick={() => editor.commands.updateAttributes('image', { align: 'left' })} 
+                className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.getAttributes('image').align === 'left' ? 'text-emerald-500' : 'text-neutral-300'}`}
+                title="Alineación izquierda"
+              >
+                <AlignLeft size={16} />
+              </button>
+              <button 
+                type="button" 
+                onMouseDown={(e) => e.preventDefault()} 
+                onClick={() => editor.commands.updateAttributes('image', { align: 'center' })} 
+                className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.getAttributes('image').align === 'center' ? 'text-emerald-500' : 'text-neutral-300'}`}
+                title="Centrar"
+              >
+                <AlignCenter size={16} />
+              </button>
+              <button 
+                type="button" 
+                onMouseDown={(e) => e.preventDefault()} 
+                onClick={() => editor.commands.updateAttributes('image', { align: 'right' })} 
+                className={`p-1.5 rounded hover:bg-neutral-700 transition-colors ${editor.getAttributes('image').align === 'right' ? 'text-emerald-500' : 'text-neutral-300'}`}
+                title="Alineación derecha"
+              >
+                <AlignRight size={16} />
+              </button>
+              <div className="w-px h-4 bg-neutral-600 mx-1" />
+              <button 
+                type="button" 
+                onMouseDown={(e) => e.preventDefault()} 
+                onClick={() => { setAltText(editor.getAttributes('image').alt || ''); setIsAltPopoverOpen(true); }} 
+                className="px-3 py-1.5 rounded hover:bg-neutral-700 text-sm font-medium text-neutral-300 transition-colors"
+              >
+                Alt text
               </button>
             </>
           )}
