@@ -31,7 +31,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
       StarterKit,
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false }),
-      Placeholder.configure({ placeholder: 'Empieza a escribir tu artículo...' }),
+      Placeholder.configure({ placeholder: 'Cuenta tu historia...' }),
       Youtube.configure({
         controls: true,
         nocookie: true,
