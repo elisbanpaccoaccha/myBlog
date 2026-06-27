@@ -1,6 +1,6 @@
 ---
 // Guardián de rutas: intercepta la cookie antes de renderizar cualquier página admin.
-import '../styles/global.css';
+import '../styles/global.css'; // Asegúrate de que esta ruta sea correcta desde la carpeta de tu layout
 import { lucia } from '../lib/lucia';
 import UserProfileDropdown from '../components/studio/UserProfileDropdown';
 import { db } from '../db/client';
@@ -9,8 +9,9 @@ import { eq } from 'drizzle-orm';
 
 interface Props {
   title: string;
+  hideNav?: boolean;
 }
-const { title } = Astro.props;
+const { title, hideNav = false } = Astro.props;
 
 // ─── Validación de sesión ────────────────────────────────────────────────────
 const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
@@ -22,13 +23,11 @@ if (!sessionId) {
 const { session, user } = await lucia.validateSession(sessionId);
 
 if (!session) {
-  // Sesión inválida o expirada → limpiar cookie y redirigir
   const blankCookie = lucia.createBlankSessionCookie();
   Astro.cookies.set(blankCookie.name, blankCookie.value, blankCookie.attributes);
   return Astro.redirect('/login');
 }
 
-// Si la sesión fue renovada (fresh), actualizar la cookie
 if (session.fresh) {
   const refreshedCookie = lucia.createSessionCookie(session.id);
   Astro.cookies.set(refreshedCookie.name, refreshedCookie.value, refreshedCookie.attributes);
@@ -48,31 +47,36 @@ const dbUser = user ? await db.select().from(usersTable).where(eq(usersTable.id,
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   </head>
-  <body class="font-sans bg-gray-50 text-gray-900 min-h-screen">
-    <!-- Nav administrador -->
-    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 md:px-6">
-      <div class="max-w-[728px] mx-auto h-16 flex items-center justify-between">
-        <a href="/studio" class="flex items-center gap-2 font-bold text-lg text-gray-900 hover:text-gray-700 transition-colors">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-          MyBlog Studio
-        </a>
-        <div class="flex items-center gap-5">
-          <a href="/" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Volver al sitio</a>
-          <!-- <a href="/studio" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Panel</a> -->
-          
-          
-          {/* Perfil de Usuario Dropdown */}
-          <UserProfileDropdown 
-            client:load 
-            displayName={dbUser?.displayName || 'Administrador'}
-            avatarUrl={dbUser?.avatarUrl || ''}
-          />
+  <body class="font-sans bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+    
+    {/* Navbar */}
+    {!hideNav && (
+      <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 md:px-6 shrink-0">
+        <div class="max-w-[728px] mx-auto h-16 flex items-center justify-between">
+          <a href="/studio" class="flex items-center gap-2 font-bold text-lg text-gray-900 hover:text-gray-700 transition-colors">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            MyBlog Studio
+          </a>
+          <div class="flex items-center gap-5">
+            <a href="/studio" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Panel</a>
+            <a href="/" class="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Ver sitio</a>
+            
+            {/* Perfil de Usuario Dropdown */}
+            <UserProfileDropdown 
+              client:load 
+              displayName={dbUser?.displayName || 'Administrador'}
+              avatarUrl={dbUser?.avatarUrl || ''}
+            />
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    )}
 
-    <main class="max-w-[728px] mx-auto px-4 md:px-0 py-8 md:py-12">
-      <slot />
+    {/* Se corrigió el contenedor aplicando flex-grow pero manteniendo las dimensiones originales dentro */}
+    <main class="flex-grow w-full">
+      <div class="max-w-[728px] mx-auto px-4 md:px-0 py-8 md:py-12">
+        <slot />
+      </div>
     </main>
   </body>
 </html>
