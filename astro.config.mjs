@@ -9,7 +9,10 @@ export default defineConfig({
     react()
   ],
   vite: {
-    plugins: [tailwind()]
+    plugins: [tailwind()],
+    ssr: {
+      noExternal: ['react-tweet']
+    }
   }
   // adapter: node() or cloudflare() based on deployment target
 });
