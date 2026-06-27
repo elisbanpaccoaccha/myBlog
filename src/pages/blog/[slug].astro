@@ -4,6 +4,7 @@ import { db } from '../../db/client.ts';
 import { posts as postsTable, users as usersTable, postTags, tags } from '../../db/schema.ts';
 import { eq, sql } from 'drizzle-orm';
 import { lucia } from '../../lib/lucia';
+import Reader from '../../components/studio/Reader.tsx';
 
 export const prerender = false;
 
@@ -31,7 +32,9 @@ const rows = await db
     publishedAt: postsTable.publishedAt,
     status:      postsTable.status,
     authorId:    postsTable.authorId,
-    author:      usersTable.username,
+    authorUsername: usersTable.username,
+    authorDisplayName: usersTable.displayName,
+    authorAvatar: usersTable.avatarUrl,
     tags:        sql<string | null>`GROUP_CONCAT(${tags.name}, ',')`,
   })
   .from(postsTable)
@@ -60,71 +63,12 @@ const post = {
   content:     row.content,
   readingTime: row.readingTime,
   publishedAt: new Date(row.publishedAt || 0),
-  author:      row.author ?? 'Admin',
+  author:      row.authorDisplayName || row.authorUsername || 'Admin',
+  authorAvatar: row.authorAvatar,
   tags:        row.tags ? row.tags.split(',').filter(Boolean) : [],
 };
 
-// ─── Renderizar el AST JSON de TipTap a HTML ────────────────────────────────
-function renderNode(node: Record<string, unknown>): string {
-  const children = (): string => {
-    const content = node.content as Record<string, unknown>[] | undefined;
-    return content ? content.map(renderNode).join('') : '';
-  };
-
-  // Aplicar marcas inline
-  const applyMarks = (text: string, marks: Record<string, unknown>[] = []): string => {
-    return marks.reduce((acc, mark) => {
-      switch (mark.type) {
-        case 'bold':      return `<strong>${acc}</strong>`;
-        case 'italic':    return `<em>${acc}</em>`;
-        case 'code':      return `<code>${acc}</code>`;
-        case 'underline': return `<u>${acc}</u>`;
-        case 'strike':    return `<s>${acc}</s>`;
-        case 'link': {
-          const href = ((mark.attrs as Record<string, unknown>)?.href as string) ?? '#';
-          return `<a href="${href}" rel="noopener noreferrer">${acc}</a>`;
-        }
-        default: return acc;
-      }
-    }, text);
-  };
-
-  switch (node.type) {
-    case 'doc':        return children();
-    case 'paragraph':  return `<p>${children()}</p>`;
-    case 'text': {
-      const raw   = (node.text as string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      const marks = (node.marks as Record<string, unknown>[]) ?? [];
-      return applyMarks(raw, marks);
-    }
-    case 'heading': {
-      const level = ((node.attrs as Record<string, unknown>)?.level as number) ?? 2;
-      return `<h${level}>${children()}</h${level}>`;
-    }
-    case 'bulletList':   return `<ul>${children()}</ul>`;
-    case 'orderedList':  return `<ol>${children()}</ol>`;
-    case 'listItem':     return `<li>${children()}</li>`;
-    case 'blockquote':   return `<blockquote>${children()}</blockquote>`;
-    case 'codeBlock':    return `<pre><code>${children()}</code></pre>`;
-    case 'hardBreak':    return '<br>';
-    case 'horizontalRule': return '<hr>';
-    case 'image': {
-      const src = ((node.attrs as Record<string, unknown>)?.src as string) ?? '';
-      const alt = ((node.attrs as Record<string, unknown>)?.alt as string) ?? '';
-      return `<img src="${src}" alt="${alt}" loading="lazy" />`;
-    }
-    default: return children();
-  }
-}
-
-let renderedContent = '';
-try {
-  const tiptapDoc = JSON.parse(post.content) as Record<string, unknown>;
-  renderedContent  = renderNode(tiptapDoc);
-} catch {
-  renderedContent = `<p>${post.content}</p>`;
-}
-
+// Eliminado el renderizador AST custom, delegamos a Reader.tsx
 const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
   year: 'numeric', month: 'long', day: 'numeric',
 });
@@ -142,9 +86,13 @@ const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
       <h1 class="article-title">{post.title}</h1>
 
       <div class="article-meta">
-        <div class="article-meta__avatar" aria-hidden="true">
-          {post.author.charAt(0).toUpperCase()}
-        </div>
+        {post.authorAvatar ? (
+          <img src={post.authorAvatar} alt={post.author} class="article-meta__avatar-img" />
+        ) : (
+          <div class="article-meta__avatar" aria-hidden="true">
+            {post.author.charAt(0).toUpperCase()}
+          </div>
+        )}
         <div class="article-meta__info">
           <span class="article-meta__author">{post.author}</span>
           <span class="article-meta__details">
@@ -191,7 +139,9 @@ const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
     )}
 
     <!-- ─── Cuerpo del artículo ───────────────────────────────────────── -->
-    <div class="prose article-body" set:html={renderedContent} />
+    <div class="article-body">
+      <Reader content={post.content} client:load />
+    </div>
 
     <!-- ─── Etiquetas ────────────────────────────────────────────────── -->
     {post.tags.length > 0 && (
@@ -241,6 +191,13 @@ const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
     display:        flex;
     align-items:    center;
     justify-content: center;
+    flex-shrink:    0;
+  }
+  .article-meta__avatar-img {
+    width:          42px;
+    height:         42px;
+    border-radius:  50%;
+    object-fit:     cover;
     flex-shrink:    0;
   }
   .article-meta__info {
