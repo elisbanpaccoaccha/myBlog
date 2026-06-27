@@ -6,6 +6,16 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import Youtube from '@tiptap/extension-youtube';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import { common, createLowlight } from 'lowlight';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+import CodeBlockComponent from './CodeBlockComponent';
+import { TwitterEmbed } from './embeds/TwitterExtension';
+import { SpotifyEmbed } from './embeds/SpotifyExtension';
+import { BookmarkEmbed } from './embeds/BookmarkExtension';
+
+const lowlight = createLowlight(common);
 import {
   Link as LinkIcon,
   Image as ImageIcon,
@@ -25,10 +35,26 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
   const hiddenInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
+  const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [isEmbedPopoverOpen, setIsEmbedPopoverOpen] = useState(false);
+  const [embedUrl, setEmbedUrl] = useState('');
 
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        codeBlock: false,
+        horizontalRule: false,
+      }),
+      CodeBlockLowlight.extend({
+        addNodeView() {
+          return ReactNodeViewRenderer(CodeBlockComponent);
+        },
+      }).configure({ lowlight }),
+      HorizontalRule,
+      TwitterEmbed,
+      SpotifyEmbed,
+      BookmarkEmbed,
       Image.configure({ inline: false, allowBase64: false }),
       Link.configure({ openOnClick: false }),
       Placeholder.configure({ placeholder: 'Cuenta tu historia...' }),
@@ -99,30 +125,51 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const addYoutubeVideo = () => {
-    const url = prompt('Introduce la URL del video de YouTube:');
-    if (url && editor) {
-      editor.commands.setYoutubeVideo({
-        src: url,
-        width: Math.max(320, parseInt('640', 10)) || 640,
-        height: Math.max(180, parseInt('480', 10)) || 480,
-      });
-    }
-  };
+  const smartParseEmbed = (url: string) => {
+    if (!editor) return;
 
-  const setLink = useCallback(() => {
-    const previousUrl = editor?.getAttributes('link').href;
-    const url = window.prompt('URL del enlace:', previousUrl);
-
-    if (url === null) return; // cancelled
-
-    if (url === '') {
-      editor?.chain().focus().extendMarkRange('link').unsetLink().run();
+    // 1. YouTube
+    if (url.match(/youtube\.com\/watch|youtu\.be/)) {
+      editor.commands.setYoutubeVideo({ src: url });
       return;
     }
 
-    editor?.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+    // 2. Twitter / X
+    const twitterMatch = url.match(/(?:twitter\.com|x\.com)\/(?:#!\/)?(\w+)\/status(es)?\/(\d+)/);
+    if (twitterMatch && twitterMatch[3]) {
+      (editor.commands as any).setTwitterEmbed({ tweetId: twitterMatch[3] });
+      return;
+    }
+
+    // 3. Spotify
+    const spotifyMatch = url.match(/open\.spotify\.com\/(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)/);
+    if (spotifyMatch) {
+      const type = spotifyMatch[1];
+      const id = spotifyMatch[2];
+      const srcUrl = `https://open.spotify.com/embed/${type}/${id}`;
+      (editor.commands as any).setSpotifyEmbed({ src: srcUrl });
+      return;
+    }
+
+    // 4. Fallback (Bookmark Link Preview)
+    (editor.commands as any).setBookmarkEmbed({ url });
+  };
+
+  const openLinkPopover = useCallback(() => {
+    const previousUrl = editor?.getAttributes('link').href;
+    setLinkUrl(previousUrl || '');
+    setIsLinkPopoverOpen(true);
   }, [editor]);
+
+  const applyLink = useCallback(() => {
+    if (linkUrl) {
+      editor?.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
+    } else {
+      editor?.chain().focus().extendMarkRange('link').unsetLink().run();
+    }
+    setIsLinkPopoverOpen(false);
+    setLinkUrl('');
+  }, [editor, linkUrl]);
 
   if (!editor) return null;
 
@@ -140,55 +187,105 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
       {/* ─── Bubble Menu (Menú de formato estilo Medium) ────────────── */}
       {editor && (
         <BubbleMenu editor={editor} className="bubble-menu">
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={editor.isActive('bold') ? 'is-active' : ''}
-            title="Negrita"
-          >
-            <b style={{ fontFamily: 'serif', fontSize: '1.1rem' }}>B</b>
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={editor.isActive('italic') ? 'is-active' : ''}
-            title="Cursiva"
-          >
-            <i style={{ fontFamily: 'serif', fontSize: '1.1rem' }}>i</i>
-          </button>
-          <button
-            type="button"
-            onClick={setLink}
-            className={editor.isActive('link') ? 'is-active' : ''}
-            title="Enlace"
-          >
-            <LinkIcon size={16} />
-          </button>
-          <div className="bubble-divider" />
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
-            title="Título 1"
-          >
-            <span style={{ fontFamily: 'serif', fontSize: '1.15rem' }}>T</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
-            title="Título 2"
-          >
-            <span style={{ fontFamily: 'serif', fontSize: '0.9rem' }}>T</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={editor.isActive('blockquote') ? 'is-active' : ''}
-            title="Cita"
-          >
-            <span style={{ fontFamily: 'serif', fontSize: '1.2rem', lineHeight: 1 }}>”</span>
-          </button>
+          {isLinkPopoverOpen ? (
+            <div className="flex items-center gap-2 px-2 py-1">
+              <input
+                type="url"
+                placeholder="https://"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    applyLink();
+                  }
+                  if (e.key === 'Escape') {
+                    setIsLinkPopoverOpen(false);
+                    setLinkUrl('');
+                  }
+                }}
+                className="bg-transparent text-white border-b border-gray-500 focus:border-emerald-500 outline-none text-sm px-1 py-0.5 w-48 transition-colors"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={applyLink}
+                className="text-emerald-500 hover:text-emerald-400 font-bold"
+                title="Aplicar enlace"
+              >
+                ✓
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLinkPopoverOpen(false);
+                  setLinkUrl('');
+                }}
+                className="text-gray-400 hover:text-gray-300 font-bold ml-1"
+                title="Cancelar"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor.chain().focus().toggleBold().run()}
+                className={editor.isActive('bold') ? 'is-active' : ''}
+                title="Negrita"
+              >
+                <b style={{ fontFamily: 'serif', fontSize: '1.1rem' }}>B</b>
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor.chain().focus().toggleItalic().run()}
+                className={editor.isActive('italic') ? 'is-active' : ''}
+                title="Cursiva"
+              >
+                <i style={{ fontFamily: 'serif', fontSize: '1.1rem' }}>i</i>
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={openLinkPopover}
+                className={editor.isActive('link') ? 'is-active' : ''}
+                title="Enlace"
+              >
+                <LinkIcon size={16} />
+              </button>
+              <div className="bubble-divider" />
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                className={editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}
+                title="Título 1"
+              >
+                <span style={{ fontFamily: 'serif', fontSize: '1.15rem' }}>T</span>
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                className={editor.isActive('heading', { level: 3 }) ? 'is-active' : ''}
+                title="Título 2"
+              >
+                <span style={{ fontFamily: 'serif', fontSize: '0.9rem' }}>T</span>
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                className={editor.isActive('blockquote') ? 'is-active' : ''}
+                title="Cita"
+              >
+                <span style={{ fontFamily: 'serif', fontSize: '1.2rem', lineHeight: 1 }}>”</span>
+              </button>
+            </>
+          )}
         </BubbleMenu>
       )}
 
@@ -199,7 +296,13 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
             <button
               type="button"
               className={`floating-btn toggle-btn ${isFloatingMenuOpen ? 'open' : ''}`}
-              onClick={() => setIsFloatingMenuOpen(!isFloatingMenuOpen)}
+              onClick={() => {
+                setIsFloatingMenuOpen(!isFloatingMenuOpen);
+                if (isFloatingMenuOpen) {
+                  setIsEmbedPopoverOpen(false);
+                  setEmbedUrl('');
+                }
+              }}
               title="Añadir bloque"
             >
               <Plus size={18} strokeWidth={2.5} />
@@ -207,44 +310,68 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
 
             {isFloatingMenuOpen && (
               <div className="floating-actions">
-                <button
+                {isEmbedPopoverOpen ? (
+                  <div className="flex items-center w-[400px] bg-white px-2 py-1">
+                    <input
+                      type="url"
+                      placeholder="Pega un enlace de YouTube, Twitter o Spotify y presiona Enter..."
+                      value={embedUrl}
+                      onChange={(e) => setEmbedUrl(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (embedUrl) {
+                            smartParseEmbed(embedUrl);
+                          }
+                          setIsEmbedPopoverOpen(false);
+                          setEmbedUrl('');
+                          setIsFloatingMenuOpen(false);
+                        }
+                        if (e.key === 'Escape') {
+                          setIsEmbedPopoverOpen(false);
+                          setEmbedUrl('');
+                        }
+                      }}
+                      className="w-full bg-transparent border-none focus:ring-0 text-slate-500 italic p-0 outline-none"
+                      autoFocus
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="floating-btn action-btn"
+                      onClick={() => { fileInputRef.current?.click(); setIsFloatingMenuOpen(false); }}
+                      title="Añadir Imagen"
+                    >
+                      <ImageIcon size={18} strokeWidth={1.5} />
+                    </button>
+                    <button
+                      type="button"
+                      className="floating-btn action-btn"
+                      onClick={() => { editor.chain().focus().toggleCodeBlock().run(); setIsFloatingMenuOpen(false); }}
+                      title="Añadir Código"
+                    >
+                      <Code size={18} strokeWidth={1.5} />
+                    </button>
+                    <button
+                      type="button"
+                      className="floating-btn action-btn"
+                      onClick={() => setIsEmbedPopoverOpen(true)}
+                      title="Añadir Embed Universal"
+                    >
+                      <Braces size={18} strokeWidth={1.5} />
+                    </button>
+                    <button
                   type="button"
                   className="floating-btn action-btn"
-                  onClick={() => { fileInputRef.current?.click(); setIsFloatingMenuOpen(false); }}
-                  title="Añadir Imagen"
-                >
-                  <ImageIcon size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  type="button"
-                  className="floating-btn action-btn"
-                  onClick={() => { addYoutubeVideo(); setIsFloatingMenuOpen(false); }}
-                  title="Añadir YouTube"
-                >
-                  <YoutubeIcon size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  type="button"
-                  className="floating-btn action-btn"
-                  onClick={() => { editor.chain().focus().toggleCodeBlock().run(); setIsFloatingMenuOpen(false); }}
-                  title="Añadir Código"
-                >
-                  <Code size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  type="button"
-                  className="floating-btn action-btn"
-                  title="Otras opciones"
-                >
-                  <Braces size={18} strokeWidth={1.5} />
-                </button>
-                <button
-                  type="button"
-                  className="floating-btn action-btn"
-                  title="Más"
+                  onClick={() => { editor.chain().focus().setHorizontalRule().run(); setIsFloatingMenuOpen(false); }}
+                  title="Separador"
                 >
                   <MoreHorizontal size={18} strokeWidth={1.5} />
                 </button>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -423,19 +550,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
           font-family: 'JetBrains Mono', 'Fira Code', monospace;
         }
         .tiptap-editor .ProseMirror pre {
-          background: #f9fafb;
-          color: #111827;
-          padding: 1.5rem;
-          border-radius: 8px;
-          overflow-x: auto;
           margin: 2rem 0;
-          font-size: 0.95rem;
-          border: 1px solid #e5e7eb;
-        }
-        .tiptap-editor .ProseMirror pre code {
-          background: transparent;
-          color: inherit;
-          padding: 0;
         }
         .tiptap-editor .ProseMirror img {
           max-width: 100%;
@@ -463,6 +578,37 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
           border: 0;
         }
         
+        /* Separador de 3 puntos (Medium style) */
+        .tiptap-editor .ProseMirror hr {
+          border: none !important;
+          border-top: none !important;
+          background: transparent !important;
+          text-align: center !important;
+          margin: 3rem 0 !important;
+          overflow: visible !important;
+          height: 0 !important;
+        }
+        .tiptap-editor .ProseMirror hr::after {
+          content: '...';
+          display: inline-block;
+          font-size: 2.2rem;
+          color: #94a3b8; /* slate-400 */
+          letter-spacing: 1em;
+          margin-left: 1em; /* Compensate for tracking */
+          line-height: 1;
+          position: relative;
+          top: -1.5rem;
+        }
+
+        /* Syntax Highlighting para lowlight (Tema Oscuro) */
+        .hljs-comment, .hljs-quote { color: #9ca3af; font-style: italic; }
+        .hljs-keyword, .hljs-selector-tag { color: #c678dd; }
+        .hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute, .hljs-meta .hljs-string { color: #98c379; }
+        .hljs-title, .hljs-section, .hljs-name { color: #e5c07b; }
+        .hljs-variable, .hljs-template-variable { color: #e06c75; }
+        .hljs-number, .hljs-built_in, .hljs-literal, .hljs-type, .hljs-params { color: #d19a66; }
+        .hljs-attr { color: #56b6c2; }
+
         /* Placeholder styling */
         .tiptap-editor .ProseMirror p.is-editor-empty:first-child::before {
           color: #d1d5db;
