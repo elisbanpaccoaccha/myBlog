@@ -53,95 +53,97 @@ if (editId) {
   }
 }
 ---
-<StudioLayout title={post ? "Editar Post" : "Escribir Post"}>
-
-  <div class="write-header">
-    <div>
-      <h1 class="write-title">{post ? "Editar artículo" : "Nuevo artículo"}</h1>
-      <p class="write-subtitle">Escribe, añade imágenes arrastrándolas y publica cuando estés listo.</p>
-    </div>
-  </div>
-
-  {result === 'ok' && slug && (
-    <div class="alert alert--success" role="alert">
-      ✅ Artículo guardado correctamente.
-      <a href={`/blog/${slug}`} class="alert__link" target="_blank" rel="noopener">Ver artículo →</a>
-    </div>
-  )}
+<StudioLayout title={post ? "Editar Post" : "Escribir Post"} hideNav={true}>
 
   <div id="toast" class="toast">Borrador guardado</div>
 
-  <form method="POST" action={actions.savePost} class="write-form" id="write-form">
+  <form method="POST" action={actions.savePost} class="relative" id="write-form">
     {post && <input type="hidden" name="id" value={post.id} />}
 
-    <!-- Título -->
-    <div class="field">
-      <label for="post-title" class="field__label">Título</label>
-      <input
-        id="post-title"
-        type="text"
-        name="title"
-        class="field__input field__input--title"
-        placeholder="Un título claro y descriptivo…"
-        required
-        maxlength="200"
-        value={post?.title as string || ''}
-      />
+    <!-- Sticky Header para Acciones -->
+    <div class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 px-4 h-16 flex items-center">
+      <div class="max-w-[728px] mx-auto w-full flex items-center justify-between">
+        <a href="/studio" class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors group">
+          <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          Volver
+        </a>
+        <div class="flex items-center gap-3">
+          <button type="submit" name="status" value="DRAFT" class="btn btn--ghost text-sm py-1.5 px-3" id="draft-btn">Guardar Borrador</button>
+          <button type="button" class="btn btn--primary text-sm py-1.5 px-4" id="open-publish-modal-btn">
+            {post?.status === 'PUBLISHED' ? 'Actualizar' : 'Publicar'}
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Extracto (excerpt) -->
-    <div class="field">
-      <label for="post-excerpt" class="field__label">
-        Extracto <span class="field__optional">(opcional, para SEO y feed)</span>
-      </label>
-      <textarea
-        id="post-excerpt"
-        name="excerpt"
-        class="field__input field__textarea"
-        placeholder="Resumen breve del artículo (máx. 200 caracteres)…"
-        maxlength="200"
-        rows="2"
-      >{post?.excerpt as string || ''}</textarea>
-    </div>
+    <div class="max-w-[728px] mx-auto py-12 px-4 md:px-0">
+      {result === 'ok' && slug && (
+        <div class="alert alert--success" role="alert">
+          ✅ Artículo guardado correctamente.
+          <a href={`/blog/${slug}`} class="alert__link" target="_blank" rel="noopener">Ver artículo →</a>
+        </div>
+      )}
 
-    <!-- Imagen de portada -->
-    <div class="field">
-      <label for="post-cover" class="field__label">
-        URL de imagen de portada <span class="field__optional">(opcional)</span>
-      </label>
-      <input
-        id="post-cover"
-        type="url"
-        name="coverImage"
-        class="field__input"
-        placeholder="https://…"
-        value={post?.coverImage as string || ''}
-      />
-    </div>
-
-    <!-- Etiquetas -->
-    <div class="field">
-      <label class="field__label">Etiquetas</label>
-      <TagSelector client:load initialTags={tags} />
-    </div>
+    <!-- Título Inmersivo -->
+    <textarea
+      id="post-title"
+      name="title"
+      class="w-full text-5xl font-bold border-none focus:ring-0 resize-none p-0 bg-transparent placeholder:text-slate-300 mb-8 outline-none leading-tight"
+      placeholder="Título"
+      required
+      rows="1"
+      style="overflow: hidden;"
+    >{post?.title as string || ''}</textarea>
 
     <!-- Editor WYSIWYG -->
-    <div class="field">
-      <label class="field__label">Contenido</label>
+    <div class="prose prose-lg md:prose-xl max-w-none focus:outline-none mb-12">
       <EditorWYSIWYG client:only="react" initialContent={post?.content as string || ''} />
     </div>
 
-    <!-- Acciones -->
-    <div class="write-actions">
-      <a href="/studio" class="btn btn--ghost">Cancelar</a>
-      <button type="submit" name="status" value="DRAFT" class="btn btn--ghost" id="draft-btn">Guardar Borrador</button>
-      <button type="submit" name="status" value="PUBLISHED" class="btn btn--primary" id="publish-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/>
-        </svg>
-        {post?.status === 'PUBLISHED' ? 'Actualizar artículo' : 'Publicar artículo'}
-      </button>
     </div>
+
+    <!-- Modal de Publicación -->
+    <div id="publish-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" id="publish-modal-backdrop"></div>
+      
+      <!-- Panel -->
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 relative z-10 transform scale-95 opacity-0 transition-all duration-200" id="publish-modal-panel">
+        
+        <div class="flex items-center justify-between p-6 border-b border-gray-100">
+          <h2 class="text-xl font-bold text-slate-900">Configuración de Publicación</h2>
+          <button type="button" id="close-publish-modal-btn" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="p-6 space-y-6">
+          <div>
+            <label class="block text-sm font-semibold text-slate-900 mb-2">URL de la Portada</label>
+            <input type="url" name="coverImage" value={post?.coverImage as string || ''} placeholder="https://ejemplo.com/imagen.jpg" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-shadow" />
+            <p class="text-xs text-gray-500 mt-1.5">Una imagen atractiva mejora el CTR en redes sociales.</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-900 mb-2">Extracto (SEO)</label>
+            <textarea name="excerpt" rows="3" placeholder="Un breve resumen de tu artículo (máx. 160 caracteres)" class="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:border-slate-900 focus:ring-1 focus:ring-slate-900 outline-none transition-shadow resize-none">{post?.excerpt as string || ''}</textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-semibold text-slate-900 mb-2">Etiquetas</label>
+            <TagSelector client:load initialTags={tags} />
+          </div>
+        </div>
+
+        <div class="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end gap-3">
+          <button type="button" id="cancel-publish-modal-btn" class="btn btn--ghost text-sm py-2 px-4">Cancelar</button>
+          <button type="submit" name="status" value="PUBLISHED" class="btn btn--primary text-sm py-2 px-6 shadow-md" id="publish-btn">
+            Confirmar y Publicar ahora
+          </button>
+        </div>
+      </div>
+    </div>
+
 
   </form>
 
@@ -154,6 +156,48 @@ if (editId) {
   const draftBtn = document.getElementById('draft-btn') as HTMLButtonElement;
   const publishBtn = document.getElementById('publish-btn') as HTMLButtonElement;
   const toast = document.getElementById('toast');
+  
+  // Auto-resize del Título
+  const titleTextarea = document.getElementById('post-title') as HTMLTextAreaElement;
+  if (titleTextarea) {
+    // Resize initial
+    titleTextarea.style.height = 'auto';
+    titleTextarea.style.height = titleTextarea.scrollHeight + 'px';
+    
+    // Resize on typing
+    titleTextarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = this.scrollHeight + 'px';
+    });
+  }
+
+  // Modal Logic
+  const modal = document.getElementById('publish-modal');
+  const modalPanel = document.getElementById('publish-modal-panel');
+  const openModalBtn = document.getElementById('open-publish-modal-btn');
+  const closeModalBtns = [
+    document.getElementById('close-publish-modal-btn'),
+    document.getElementById('cancel-publish-modal-btn'),
+    document.getElementById('publish-modal-backdrop')
+  ];
+
+  const toggleModal = (show: boolean) => {
+    if (!modal || !modalPanel) return;
+    if (show) {
+      modal.classList.remove('hidden');
+      // trigger reflow
+      void modal.offsetWidth;
+      modalPanel.classList.remove('scale-95', 'opacity-0');
+      modalPanel.classList.add('scale-100', 'opacity-100');
+    } else {
+      modalPanel.classList.remove('scale-100', 'opacity-100');
+      modalPanel.classList.add('scale-95', 'opacity-0');
+      setTimeout(() => modal.classList.add('hidden'), 200);
+    }
+  };
+
+  openModalBtn?.addEventListener('click', () => toggleModal(true));
+  closeModalBtns.forEach(btn => btn?.addEventListener('click', () => toggleModal(false)));
   
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -239,47 +283,13 @@ if (editId) {
     font-weight: 600;
     text-decoration: underline;
   }
-  .write-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.75rem;
-    max-width: 860px;
-  }
-  .field { display: flex; flex-direction: column; gap: 0.4rem; }
-  .field__label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #374151;
-  }
-  .field__optional {
-    font-weight: 400;
-    color: #9ca3af;
-  }
-  .field__input {
-    padding: 0.7rem 0.9rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    color: #111827;
-    background: #fff;
-    font-family: inherit;
-    outline: none;
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .field__input:focus {
-    border-color: #111827;
-    box-shadow: 0 0 0 3px rgba(17,24,39,0.08);
-  }
-  .field__input--title {
-    font-size: 1.15rem;
-    font-weight: 600;
-  }
-  .field__textarea { resize: vertical; }
   .write-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 0.75rem;
-    padding-top: 0.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
   }
   .btn {
     display: inline-flex;
