@@ -28,16 +28,22 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Maximize2
+  Maximize2,
+  Sparkles,
 } from 'lucide-react';
 
 interface Props {
   initialContent?: string;
   onContentChange?: (json: string) => void;
+  onSelectedTextChange?: (text: string) => void;
+  onInlineAIRequest?: (prompt: string) => void;
+  editorRef?: React.MutableRefObject<any>;
 }
 
-export default function EditorWYSIWYG({ initialContent = '', onContentChange }: Props) {
-  const hiddenInputRef = useRef<HTMLInputElement>(null);
+export default function EditorWYSIWYG({ initialContent = '', onContentChange, onSelectedTextChange, onInlineAIRequest, editorRef }: Props) {
+  const [contentJson, setContentJson] = useState(() => {
+    return initialContent || JSON.stringify({ type: 'doc', content: [{ type: 'paragraph' }] });
+  });
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFloatingMenuOpen, setIsFloatingMenuOpen] = useState(false);
   const [isLinkPopoverOpen, setIsLinkPopoverOpen] = useState(false);
@@ -46,6 +52,8 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
   const [altText, setAltText] = useState('');
   const [isEmbedPopoverOpen, setIsEmbedPopoverOpen] = useState(false);
   const [embedUrl, setEmbedUrl] = useState('');
+  const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -76,15 +84,27 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
     },
     onUpdate({ editor: e }) {
       const json = JSON.stringify(e.getJSON());
-      if (hiddenInputRef.current) hiddenInputRef.current.value = json;
+      setContentJson(json);
       onContentChange?.(json);
       // Cerramos el menú flotante al escribir
       setIsFloatingMenuOpen(false);
     },
-    onSelectionUpdate() {
+    onSelectionUpdate({ editor: e }) {
       setIsFloatingMenuOpen(false);
+      if (onSelectedTextChange) {
+        const { from, to, empty } = e.state.selection;
+        const text = empty ? '' : e.state.doc.textBetween(from, to, ' ');
+        onSelectedTextChange(text);
+      }
     }
   });
+
+  // ─── Expose editor instance via ref for AI integration ──────────────────────
+  React.useEffect(() => {
+    if (editorRef && editor) {
+      editorRef.current = editor;
+    }
+  }, [editor, editorRef]);
 
   // ─── Subida de imagen (Drag & Drop y Botón) ───────────────────────────
   const uploadImage = async (file: File) => {
@@ -296,6 +316,18 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
               >
                 <span style={{ fontFamily: 'serif', fontSize: '1.2rem', lineHeight: 1 }}>”</span>
               </button>
+              <div className="bubble-divider" />
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-ai-assistant'));
+                }}
+                className="ai-bubble-btn"
+                title="Asistente IA"
+              >
+                <Sparkles size={15} />
+              </button>
             </>
           )}
         </BubbleMenu>
@@ -391,6 +423,8 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
                 if (isFloatingMenuOpen) {
                   setIsEmbedPopoverOpen(false);
                   setEmbedUrl('');
+                  setIsAIPopoverOpen(false);
+                  setAiPrompt('');
                 }
               }}
               title="Añadir bloque"
@@ -400,7 +434,33 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
 
             {isFloatingMenuOpen && (
               <div className="floating-actions">
-                {isEmbedPopoverOpen ? (
+                {isAIPopoverOpen ? (
+                  <div className="flex items-center w-[400px] bg-white px-2 py-1 shadow-lg border border-purple-200 rounded-md">
+                    <input
+                      type="text"
+                      placeholder="Dile a la IA qué escribir..."
+                      value={aiPrompt}
+                      onChange={(e) => setAiPrompt(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (aiPrompt.trim() && onInlineAIRequest) {
+                            onInlineAIRequest(aiPrompt);
+                          }
+                          setIsAIPopoverOpen(false);
+                          setAiPrompt('');
+                          setIsFloatingMenuOpen(false);
+                        }
+                        if (e.key === 'Escape') {
+                          setIsAIPopoverOpen(false);
+                          setAiPrompt('');
+                        }
+                      }}
+                      className="w-full bg-transparent border-none focus:ring-0 text-purple-900 placeholder:text-purple-300 p-0 outline-none text-sm"
+                      autoFocus
+                    />
+                  </div>
+                ) : isEmbedPopoverOpen ? (
                   <div className="flex items-center w-[400px] bg-white px-2 py-1">
                     <input
                       type="url"
@@ -428,6 +488,14 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
                   </div>
                 ) : (
                   <>
+                    <button
+                      type="button"
+                      className="floating-btn action-btn text-violet-500 hover:text-violet-600"
+                      onClick={() => setIsAIPopoverOpen(true)}
+                      title="Generar con IA"
+                    >
+                      <Sparkles size={18} strokeWidth={2} />
+                    </button>
                     <button
                       type="button"
                       className="floating-btn action-btn"
@@ -478,10 +546,9 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
       </div>
 
       <input
-        ref={hiddenInputRef}
         type="hidden"
         name="content"
-        defaultValue={initialContent || JSON.stringify({ type: 'doc', content: [{ type: 'paragraph' }] })}
+        value={contentJson}
       />
 
       <style>{`
@@ -706,6 +773,24 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange }: 
           float: left;
           height: 0;
           pointer-events: none;
+        }
+
+        /* AI Bubble Button */
+        .ai-bubble-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #7c3aed, #4f46e5);
+          border: none;
+          color: #ffffff;
+          border-radius: 4px;
+          padding: 6px 8px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+        .ai-bubble-btn:hover {
+          background: linear-gradient(135deg, #6d28d9, #4338ca);
+          transform: scale(1.1);
         }
       `}</style>
     </div>
