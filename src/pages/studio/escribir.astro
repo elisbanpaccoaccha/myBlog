@@ -1,6 +1,6 @@
 ---
 import StudioLayout from '../../layouts/StudioLayout.astro';
-import EditorWYSIWYG from '../../components/studio/EditorWYSIWYG';
+import EditorWithAI from '../../components/studio/EditorWithAI';
 import TagSelector from '../../components/studio/TagSelector';
 import { actions } from 'astro:actions';
 import { db } from '../../db/client.ts';
@@ -95,9 +95,9 @@ if (editId) {
       style="overflow: hidden;"
     >{post?.title as string || ''}</textarea>
 
-    <!-- Editor WYSIWYG -->
+    <!-- Editor WYSIWYG con Asistente IA -->
     <div class="prose prose-lg md:prose-xl max-w-none focus:outline-none mb-12">
-      <EditorWYSIWYG client:only="react" initialContent={post?.content as string || ''} />
+      <EditorWithAI client:only="react" initialContent={post?.content as string || ''} />
     </div>
 
     </div>
