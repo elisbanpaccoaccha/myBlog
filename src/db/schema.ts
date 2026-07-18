@@ -3,11 +3,21 @@ import { sqliteTable, text, integer, primaryKey } from 'drizzle-orm/sqlite-core'
 export const users = sqliteTable('Users', {
   id: text('id').primaryKey(),
   username: text('username').unique().notNull(),
+  email: text('email').unique().notNull(),
+  emailVerified: integer('emailVerified').default(0).notNull(),
   password_hash: text('password_hash').notNull(),
-  role: text('role').default('AUTHOR').notNull(),
+  role: text('role').default('USER').notNull(),
   displayName: text('displayName'),
   bio: text('bio'),
   avatarUrl: text('avatarUrl'),
+});
+
+export const emailVerificationTokens = sqliteTable('EmailVerificationTokens', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  expiresAt: integer('expires_at').notNull(),
 });
 
 export const sessions = sqliteTable('Sessions', {
