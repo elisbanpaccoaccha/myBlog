@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const email = Astro.url.searchParams.get('email') || 'tu correo';
+---
+<BaseLayout title="Verifica tu correo — MyBlog">
+  <div class="login-wrapper">
+    <div class="login-card">
+
+      <!-- Logo / Brand -->
+      <div class="login-brand" style="justify-content: center; margin-bottom: 1rem;">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+
+      <h1 class="login-title" style="text-align: center;">Revisa tu bandeja</h1>
+      <p class="login-subtitle" style="text-align: center;">
+        Hemos enviado un enlace de confirmación a:<br/>
+        <strong>{email}</strong>
+      </p>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #4b5563;">
+        <p>Haz clic en el enlace del correo para activar tu cuenta e iniciar sesión automáticamente.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.8rem; color: #9ca3af;">Si no lo ves, revisa la carpeta de spam. El enlace expirará en 15 minutos.</p>
+      </div>
+
+      <div style="margin-top: 2rem; text-align: center;">
+        <a href="/login" class="login-btn" style="display: inline-block; text-decoration: none;">Volver al inicio</a>
+      </div>
+
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .login-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+  }
+  .login-brand {
+    display: flex;
+    align-items: center;
+  }
+  .login-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.03em;
+  }
+  .login-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  .login-btn {
+    padding: 0.8rem 1.5rem;
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    font-family: inherit;
+  }
+  .login-btn:hover { background: #1f2937; }
+</style>
