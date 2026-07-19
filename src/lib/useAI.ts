@@ -5,6 +5,7 @@ import { getAIConfig } from './aiConfig';
 
 interface GenerateOptions {
   systemPrompt?: string;
+  history?: { role: 'user' | 'assistant'; content: string }[];
   onToken?: (token: string) => void;
   signal?: AbortSignal;
 }
@@ -142,8 +143,9 @@ export async function generateAI(
   const { systemPrompt, onToken, signal } = options;
   const config = getAIConfig();
 
-  const messages = [
+  const fullMessages = [
     ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
+    ...(options.history || []),
     { role: 'user' as const, content: prompt },
   ];
 
@@ -154,7 +156,7 @@ export async function generateAI(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: config.model,
-        messages,
+        messages: fullMessages,
         stream: true,
       }),
       signal,
@@ -179,7 +181,7 @@ export async function generateAI(
       provider: config.provider,
       apiKey: config.apiKey,
       model: config.model,
-      messages,
+      messages: fullMessages,
     }),
     signal,
   });
