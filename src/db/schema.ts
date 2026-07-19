@@ -20,6 +20,13 @@ export const emailVerificationTokens = sqliteTable('EmailVerificationTokens', {
   expiresAt: integer('expires_at').notNull(),
 });
 
+export const passwordResetTokens = sqliteTable('PasswordResetTokens', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  code: text('code').notNull(),
+  expiresAt: integer('expires_at').notNull(),
+});
+
 export const sessions = sqliteTable('Sessions', {
   id: text('id').primaryKey(),
   userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
