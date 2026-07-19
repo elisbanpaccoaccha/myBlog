@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-export default function UserProfileDropdown({ displayName = 'Administrador', avatarUrl = '' }: { displayName?: string; avatarUrl?: string }) {
+export default function UserProfileDropdown({ displayName, username = '', avatarUrl = '' }: { displayName?: string; username?: string; avatarUrl?: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const initial = displayName ? displayName.charAt(0).toUpperCase() : 'A';
+  const displayString = displayName || username || 'U';
+  const initial = displayString.charAt(0).toUpperCase();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -31,8 +32,9 @@ export default function UserProfileDropdown({ displayName = 'Administrador', ava
 
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-slate-200 rounded-md shadow-lg py-1 z-50">
-          <div className="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider truncate">
-            {displayName}
+          <div className="px-4 py-2 border-b border-slate-100">
+            <div className="text-sm font-semibold text-slate-900 truncate">{displayName || username || 'Usuario'}</div>
+            {username && <div className="text-xs text-slate-500 truncate mt-0.5">@{username}</div>}
           </div>
           <a href="/studio/perfil" className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
             Ajustes
