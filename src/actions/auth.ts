@@ -2,7 +2,7 @@ import { defineAction, ActionError } from 'astro:actions';
 import { z } from 'astro:schema';
 import { lucia } from '../lib/lucia';
 import { db } from '../db/client.ts';
-import { users, emailVerificationTokens } from '../db/schema.ts';
+import { users, emailVerificationTokens, passwordResetTokens } from '../db/schema.ts';
 import { eq, or } from 'drizzle-orm';
 import { scrypt, randomBytes } from 'node:crypto';
 import { promisify } from 'node:util';
@@ -67,7 +67,7 @@ export const authActions = {
       const hashedPassword = await hashPassword(input.password);
       const userId = nanoid();
 
-      // Crear usuario no verificado con rol de autor (como Medium)
+      // Crear usuario
       await db.insert(users).values({
         id: userId,
         username: input.username,
@@ -95,8 +95,8 @@ export const authActions = {
       // Enviar email con Resend
       const verifyLink = `${import.meta.env.PUBLIC_URL || 'http://localhost:4321'}/api/verify-email?token=${code}`;
 
-      await resend.emails.send({
-        from: 'MyBlog <onboarding@resend.dev>',
+      const { data, error } = await resend.emails.send({
+        from: 'MyBlog <hola@platanito.dev>',
         to: input.email,
         subject: 'Confirma tu correo electrónico - MyBlog',
         html: `
@@ -109,11 +109,19 @@ export const authActions = {
         `,
       });
 
+      if (error) {
+        console.error("Resend Error:", error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Error al enviar correo: ${error.message}`,
+        });
+      }
+
       return { success: true, email: input.email };
     }
   }),
 
-  /** Inicio de sesión: valida credenciales, crea sesión en Turso y fija cookie */
+
   login: defineAction({
     accept: 'form',
     input: z.object({
@@ -125,7 +133,7 @@ export const authActions = {
       const [user] = await db
         .select({ id: users.id, password_hash: users.password_hash, emailVerified: users.emailVerified })
         .from(users)
-        .where(eq(users.username, input.username))
+        .where(or(eq(users.username, input.username), eq(users.email, input.username)))
         .limit(1);
 
       if (!user) {
@@ -167,5 +175,113 @@ export const authActions = {
       context.cookies.set(blankCookie.name, blankCookie.value, blankCookie.attributes);
       return { success: true };
     },
+  }),
+
+  forgotPassword: defineAction({
+    accept: 'form',
+    input: z.object({
+      email: z.string().min(1, 'El correo/usuario es requerido'),
+    }),
+    handler: async (input) => {
+      // Buscar usuario (puede ser username o email)
+      const existingUser = await db
+        .select({ id: users.id, email: users.email })
+        .from(users)
+        .where(or(eq(users.username, input.email), eq(users.email, input.email)))
+        .limit(1);
+
+      // Por seguridad, siempre decimos "Si existe, te enviaremos..." para no filtrar datos,
+      // a menos que sea un error crítico. En este caso simplemente retornamos success.
+      if (existingUser.length === 0) {
+        return { success: true };
+      }
+
+      const user = existingUser[0];
+
+      // Borrar tokens previos del usuario para evitar ataques de replay o múltiples envíos válidos
+      await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
+
+      const resend = new Resend(import.meta.env.API_RESEND);
+      const tokenId = nanoid();
+      const code = nanoid(32);
+      // Expira en 3 minutos exactos
+      const expiresAt = Math.floor(Date.now() / 1000) + 3 * 60;
+
+      await db.insert(passwordResetTokens).values({
+        id: tokenId,
+        userId: user.id,
+        code,
+        expiresAt,
+      });
+
+      const resetLink = `${import.meta.env.PUBLIC_URL || 'http://localhost:4321'}/reset-password?token=${code}`;
+
+      const { error } = await resend.emails.send({
+        from: 'MyBlog <hola@platanito.dev>',
+        to: user.email, // Usamos el email real de la DB, no el input (por si el input fue username)
+        subject: 'Recuperación de contraseña - MyBlog',
+        html: `
+          <h1>Solicitud de cambio de contraseña</h1>
+          <p>Hemos recibido una solicitud para cambiar tu contraseña.</p>
+          <a href="${resetLink}" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:5px;">
+            Restablecer contraseña
+          </a>
+          <p>Este enlace expirará en exactamente 3 minutos por motivos de seguridad.</p>
+          <p>Si no fuiste tú, puedes ignorar este mensaje.</p>
+        `,
+      });
+
+      if (error) {
+        console.error("Resend Error:", error);
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Error al enviar el correo de recuperación.',
+        });
+      }
+
+      return { success: true };
+    }
+  }),
+
+  resetPassword: defineAction({
+    accept: 'form',
+    input: z.object({
+      token: z.string().min(1, 'Token inválido'),
+      password: z.string().min(8, 'La nueva contraseña debe tener al menos 8 caracteres'),
+      confirmPassword: z.string(),
+    }).refine((data) => data.password === data.confirmPassword, {
+      message: 'Las contraseñas no coinciden',
+      path: ['confirmPassword'],
+    }),
+    handler: async (input) => {
+      // Buscar token
+      const tokens = await db
+        .select()
+        .from(passwordResetTokens)
+        .where(eq(passwordResetTokens.code, input.token))
+        .limit(1);
+
+      if (tokens.length === 0) {
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'Enlace inválido o expirado' });
+      }
+
+      const tokenRecord = tokens[0];
+      const now = Math.floor(Date.now() / 1000);
+
+      // Borrar token inmediatamente para que no se re-use
+      await db.delete(passwordResetTokens).where(eq(passwordResetTokens.id, tokenRecord.id));
+
+      if (now > tokenRecord.expiresAt) {
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'El enlace ha expirado (3 minutos)' });
+      }
+
+      // Cambiar contraseña
+      const hashedPassword = await hashPassword(input.password);
+      await db.update(users)
+        .set({ password_hash: hashedPassword })
+        .where(eq(users.id, tokenRecord.userId));
+
+      return { success: true };
+    }
   }),
 };
