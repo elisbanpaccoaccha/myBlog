@@ -64,7 +64,8 @@ const dbUser = user ? await db.select().from(usersTable).where(eq(usersTable.id,
             {/* Perfil de Usuario Dropdown */}
             <UserProfileDropdown 
               client:load 
-              displayName={dbUser?.displayName || 'Administrador'}
+              displayName={dbUser?.displayName || ''}
+              username={dbUser?.username || ''}
               avatarUrl={dbUser?.avatarUrl || ''}
             />
           </div>
