@@ -39,4 +39,30 @@ export const profileActions = {
       }
     },
   }),
+  deleteAccount: defineAction({
+    handler: async (_input, context) => {
+      const sessionId = context.cookies.get(lucia.sessionCookieName)?.value;
+      if (!sessionId) {
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'No session found' });
+      }
+
+      const { user } = await lucia.validateSession(sessionId);
+      if (!user) {
+        throw new ActionError({ code: 'UNAUTHORIZED', message: 'Invalid session' });
+      }
+
+      try {
+        // Al borrar el usuario, la constraint 'CASCADE' en Drizzle borrará sus sesiones, tokens y posts.
+        await db.delete(users).where(eq(users.id, user.id));
+        
+        // Destruir la cookie de sesión en el navegador
+        const blankCookie = lucia.createBlankSessionCookie();
+        context.cookies.set(blankCookie.name, blankCookie.value, blankCookie.attributes);
+        
+        return { success: true };
+      } catch (e) {
+        throw new ActionError({ code: 'INTERNAL_SERVER_ERROR', message: 'Error al borrar la cuenta' });
+      }
+    }
+  }),
 };
