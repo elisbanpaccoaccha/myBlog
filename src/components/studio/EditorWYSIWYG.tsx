@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import { BubbleMenu, FloatingMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
@@ -54,6 +54,25 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
   const [embedUrl, setEmbedUrl] = useState('');
   const [isAIPopoverOpen, setIsAIPopoverOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
+  
+  const floatingMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (floatingMenuRef.current && !floatingMenuRef.current.contains(event.target as Node)) {
+        setIsFloatingMenuOpen(false);
+        setIsEmbedPopoverOpen(false);
+        setIsAIPopoverOpen(false);
+      }
+    };
+
+    if (isFloatingMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isFloatingMenuOpen]);
 
   const editor = useEditor({
     extensions: [
@@ -414,7 +433,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
       {/* ─── Floating Menu (Menú expansible tipo Medium en líneas vacías) ───────────── */}
       {editor && (
         <FloatingMenu editor={editor} className="floating-menu">
-          <div className="floating-menu-container">
+          <div className="floating-menu-container" ref={floatingMenuRef}>
             <button
               type="button"
               className={`floating-btn toggle-btn ${isFloatingMenuOpen ? 'open' : ''}`}
