@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { db } from '../../db/client.ts';
-import { posts as postsTable, users as usersTable, postTags, tags } from '../../db/schema.ts';
-import { eq, sql } from 'drizzle-orm';
+import { posts as postsTable, users as usersTable, postTags, tags, bookmarks, comments, likes } from '../../db/schema.ts';
+import { eq, sql, and } from 'drizzle-orm';
 import { lucia } from '../../lib/lucia';
 import Reader from '../../components/studio/Reader.tsx';
+import BookmarkButton from '../../components/blog/BookmarkButton.tsx';
+import CommentsSection from '../../components/blog/CommentsSection.tsx';
+import LikeButton from '../../components/blog/LikeButton.tsx';
 
 export const prerender = false;
 
@@ -56,6 +59,7 @@ if (row.status === 'DRAFT' && row.authorId !== currentUserId) {
   return Astro.redirect('/404');
 }
 const post = {
+  id:          row.id,
   title:       row.title,
   slug:        row.slug,
   excerpt:     row.excerpt ?? '',
@@ -72,6 +76,41 @@ const post = {
 const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
   year: 'numeric', month: 'long', day: 'numeric',
 });
+
+let initialBookmarked = false;
+let initialCommentCount = 0;
+let initialLikeCount = 0;
+let initialUserLikeCount = 0;
+
+if (post.id) {
+  const [{ count }] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(comments)
+    .where(eq(comments.postId, post.id));
+  initialCommentCount = count;
+
+  const [{ totalLikes }] = await db
+    .select({ totalLikes: sql<number>`sum(${likes.count})` })
+    .from(likes)
+    .where(eq(likes.postId, post.id));
+  initialLikeCount = totalLikes || 0;
+}
+
+if (currentUserId && post.id) {
+  const [bkmk] = await db
+    .select()
+    .from(bookmarks)
+    .where(and(eq(bookmarks.userId, currentUserId), eq(bookmarks.postId, post.id)))
+    .limit(1);
+  initialBookmarked = !!bkmk;
+
+  const [lk] = await db
+    .select()
+    .from(likes)
+    .where(and(eq(likes.userId, currentUserId), eq(likes.postId, post.id)))
+    .limit(1);
+  initialUserLikeCount = lk ? lk.count : 0;
+}
 ---
 <BaseLayout
   title={post.title}
@@ -105,23 +144,17 @@ const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
     <!-- ─── Línea de acciones (estilo Medium: aplausos, comentarios, etc.) -->
     <div class="article-actions" role="toolbar">
       <div class="article-actions__left">
-        <button class="action-btn" type="button" aria-label="Aplaudir">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M14.5 7.5L9 13l-1.5-1.5M7 18.5l-4-4a2.83 2.83 0 010-4l8-8a2 2 0 013 0l.5.5.5-.5a2 2 0 013 0l1 1a2 2 0 010 2.83l-.5.5.17.17a2 2 0 010 2.83L15 16l.17.17A2 2 0 0115 19l-1 1a2 2 0 01-2.83 0L10 18.83l-.5.5A2 2 0 017 18.5z"/>
-          </svg>
-        </button>
-        <button class="action-btn" type="button" aria-label="Comentar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <LikeButton client:load postId={post.id} initialLikeCount={initialLikeCount} initialUserLikeCount={initialUserLikeCount} />
+        
+        <a href="#comments" class="action-btn flex items-center justify-center gap-1.5 group relative px-1 rounded-full transition-colors" style="width: auto; min-width: 36px;" aria-label="Ver comentarios">
+          <svg class="text-[#6b6b6b] group-hover:text-[#1a1a1a] transition-colors" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
           </svg>
-        </button>
+          {initialCommentCount > 0 && <span class="text-[13px] font-medium text-[#6b6b6b] group-hover:text-[#1a1a1a] pr-1">{initialCommentCount}</span>}
+        </a>
       </div>
       <div class="article-actions__right">
-        <button class="action-btn" type="button" aria-label="Guardar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
-          </svg>
-        </button>
+        <BookmarkButton client:load postId={post.id} initialBookmarked={initialBookmarked} />
         <button class="action-btn" type="button" aria-label="Compartir">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -151,6 +184,9 @@ const formattedDate = post.publishedAt.toLocaleDateString('es-ES', {
         ))}
       </div>
     )}
+
+    <!-- ─── Sección de Comentarios ───────────────────────────────────── -->
+    <CommentsSection client:load postId={post.id} commentCount={initialCommentCount} currentUserId={currentUserId} />
 
   </article>
 </BaseLayout>
