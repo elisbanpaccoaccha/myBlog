@@ -23,6 +23,8 @@ const rows = await db
     publishedAt: postsTable.publishedAt,
     createdAt:   postsTable.createdAt,
     updatedAt:   postsTable.updatedAt,
+    viewCount:   postsTable.viewCount,
+    readCount:   postsTable.readCount,
   })
   .from(postsTable)
   .where(eq(postsTable.authorId, user.id))
@@ -39,6 +41,8 @@ const posts = rows.map(row => ({
   publishedAt: row.publishedAt,
   createdAt:   row.createdAt,
   updatedAt:   row.updatedAt,
+  viewCount:   row.viewCount,
+  readCount:   row.readCount,
 }));
 ---
 <StudioLayout title="Dashboard">
