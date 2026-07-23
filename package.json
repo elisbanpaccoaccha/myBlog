@@ -1,5 +1,5 @@
 {
-  "name": "myblog",
+  "name": "toblog",
   "type": "module",
   "version": "0.0.1",
   "engines": {
@@ -75,5 +75,6 @@
     "tailwindcss": "^4.3.1",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.62.0"
-  }
+  },
+  "license": "MIT"
 }
