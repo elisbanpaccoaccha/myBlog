@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { db } from '../db/client';
+import { posts, bookmarks, users } from '../db/schema';
+import { eq, desc } from 'drizzle-orm';
+import { lucia } from '../lib/lucia';
+
+const sessionId = Astro.cookies.get(lucia.sessionCookieName)?.value;
+if (!sessionId) return Astro.redirect('/login');
+const { user } = await lucia.validateSession(sessionId);
+if (!user) return Astro.redirect('/login');
+
+// Obtener los artículos guardados por el usuario
+const savedPosts = await db
+  .select({
+    id: posts.id,
+    title: posts.title,
+    slug: posts.slug,
+    excerpt: posts.excerpt,
+    coverImage: posts.coverImage,
+    readingTime: posts.readingTime,
+    publishedAt: posts.publishedAt,
+    authorName: users.displayName,
+    authorUsername: users.username,
+    authorAvatar: users.avatarUrl,
+  })
+  .from(bookmarks)
+  .innerJoin(posts, eq(bookmarks.postId, posts.id))
+  .innerJoin(users, eq(posts.authorId, users.id))
+  .where(eq(bookmarks.userId, user.id))
+  .orderBy(desc(bookmarks.createdAt));
+---
+<BaseLayout title="Tu Biblioteca">
+  <div class="max-w-[728px] mx-auto px-5 py-12">
+    <h1 class="text-[32px] md:text-[40px] font-bold text-slate-900 mb-2 font-serif tracking-tight">Tu biblioteca</h1>
+    <p class="text-slate-500 mb-10 text-[15px]">Tus historias guardadas y artículos para leer más tarde.</p>
+
+    <div class="border-b border-gray-200 mb-8">
+      <nav class="flex gap-6">
+        <a href="#" class="pb-3 border-b-2 border-slate-900 font-medium text-slate-900 text-[14px]">Guardados</a>
+      </nav>
+    </div>
+
+    {savedPosts.length === 0 ? (
+      <div class="bg-gray-50 rounded-xl p-10 text-center border border-gray-100 mt-10">
+        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm border border-gray-100">
+          <svg class="text-emerald-600 w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-900 mb-2">Aún no has guardado ninguna historia</h3>
+        <p class="text-slate-500 mb-6 text-[15px] max-w-sm mx-auto">Explora artículos en la plataforma y guárdalos para leerlos cuando tengas tiempo.</p>
+        <a href="/blog" class="inline-block bg-emerald-600 text-white px-6 py-2.5 rounded-full font-medium hover:bg-emerald-700 transition-colors shadow-sm">
+          Explorar artículos
+        </a>
+      </div>
+    ) : (
+      <div class="flex flex-col gap-10">
+        {savedPosts.map((post) => (
+          <article class="flex flex-col sm:flex-row gap-6 group border-b border-gray-100 pb-10 last:border-0 last:pb-0">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2.5 mb-2.5">
+                {post.authorAvatar ? (
+                  <img src={post.authorAvatar} alt={post.authorName || post.authorUsername} class="w-6 h-6 rounded-full object-cover" />
+                ) : (
+                  <div class="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[11px] font-bold">
+                    {(post.authorName || post.authorUsername).charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span class="text-[13.5px] font-medium text-slate-800">{post.authorName || post.authorUsername}</span>
+              </div>
+              
+              <a href={`/blog/${post.slug}`} class="block group-hover:opacity-80 transition-opacity">
+                <h2 class="text-[20px] font-bold text-slate-900 mb-2 leading-snug line-clamp-2">{post.title}</h2>
+                {post.excerpt && (
+                  <p class="text-slate-600 text-[15px] leading-relaxed line-clamp-2 hidden sm:block mb-3 font-serif">
+                    {post.excerpt}
+                  </p>
+                )}
+              </a>
+              
+              <div class="flex items-center gap-2 text-[13px] text-slate-500 mt-4 sm:mt-0">
+                <time datetime={post.publishedAt ? new Date(post.publishedAt).toISOString() : ''}>
+                  {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('es-ES', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                </time>
+                <span>·</span>
+                <span>{post.readingTime} min de lectura</span>
+              </div>
+            </div>
+            
+            {post.coverImage && (
+              <a href={`/blog/${post.slug}`} class="block sm:w-[160px] sm:h-[110px] w-full h-[200px] shrink-0 mt-4 sm:mt-0">
+                <img src={post.coverImage} alt={post.title} class="w-full h-full object-cover rounded border border-gray-100 shadow-sm" />
+              </a>
+            )}
+          </article>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
