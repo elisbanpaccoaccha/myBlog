@@ -61,3 +61,40 @@ export const postTags = sqliteTable('PostTags', {
 }, (table) => ({
   pk: primaryKey({ columns: [table.postId, table.tagId] }),
 }));
+
+export const bookmarks = sqliteTable('Bookmarks', {
+  userId: text('userId').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  postId: text('postId').references(() => posts.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: text('createdAt').notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.postId] }),
+}));
+
+export const likes = sqliteTable('Likes', {
+  userId: text('userId').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  postId: text('postId').references(() => posts.id, { onDelete: 'cascade' }).notNull(),
+  count: integer('count').default(1).notNull(),
+  createdAt: text('createdAt').notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.postId] }),
+}));
+
+export const comments = sqliteTable('Comments', {
+  id: text('id').primaryKey(),
+  userId: text('userId').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  postId: text('postId').references(() => posts.id, { onDelete: 'cascade' }).notNull(),
+  parentId: text('parentId'),
+  content: text('content').notNull(),
+  isDeleted: integer('isDeleted').default(0).notNull(),
+  createdAt: text('createdAt').notNull(),
+  updatedAt: text('updatedAt').notNull(),
+});
+
+export const commentLikes = sqliteTable('CommentLikes', {
+  userId: text('userId').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  commentId: text('commentId').references(() => comments.id, { onDelete: 'cascade' }).notNull(),
+  count: integer('count').default(1).notNull(),
+  createdAt: text('createdAt').notNull(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.userId, table.commentId] }),
+}));
