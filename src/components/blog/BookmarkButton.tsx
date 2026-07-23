@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { actions } from 'astro:actions';
+import AuthModal from './AuthModal';
 
 interface BookmarkButtonProps {
   postId: string;
@@ -9,6 +10,7 @@ interface BookmarkButtonProps {
 export default function BookmarkButton({ postId, initialBookmarked = false }: BookmarkButtonProps) {
   const [isBookmarked, setIsBookmarked] = useState(initialBookmarked);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const toggle = async () => {
     const previousState = isBookmarked;
@@ -24,7 +26,7 @@ export default function BookmarkButton({ postId, initialBookmarked = false }: Bo
       // Revert if backend fails (e.g., unauthorized)
       setIsBookmarked(previousState);
       if (error.code === 'UNAUTHORIZED') {
-        alert('Por favor, inicia sesión para guardar artículos.');
+        setShowAuthModal(true);
       }
     } else if (data) {
       // Sync with truth just in case
@@ -33,6 +35,7 @@ export default function BookmarkButton({ postId, initialBookmarked = false }: Bo
   };
 
   return (
+    <>
     <button
       onClick={toggle}
       type="button"
@@ -51,5 +54,11 @@ export default function BookmarkButton({ postId, initialBookmarked = false }: Bo
         <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z"/>
       </svg>
     </button>
+    <AuthModal 
+      isOpen={showAuthModal} 
+      onClose={() => setShowAuthModal(false)} 
+      title="Inicia sesión para guardar"
+    />
+    </>
   );
 }
