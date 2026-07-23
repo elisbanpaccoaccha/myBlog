@@ -44,7 +44,8 @@ export const authActions = {
       path: ['confirmPassword'],
     }),
     handler: async (input) => {
-      const resend = new Resend(import.meta.env.API_RESEND);
+      const apiKey = import.meta.env.API_RESEND || (typeof process !== 'undefined' ? process.env.API_RESEND : '');
+      const resend = apiKey ? new Resend(apiKey) : null;
       // Verificar si existe el usuario o email
       const existingUser = await db
         .select({ id: users.id, username: users.username, email: users.email })
@@ -93,28 +94,29 @@ export const authActions = {
       });
 
       // Enviar email con Resend
-      const verifyLink = `${import.meta.env.PUBLIC_URL || 'http://localhost:4321'}/api/verify-email?token=${code}`;
+      const baseUrl = import.meta.env.PUBLIC_URL || (typeof process !== 'undefined' ? process.env.PUBLIC_URL : '') || 'http://localhost:4321';
+      const verifyLink = `${baseUrl}/api/verify-email?token=${code}`;
 
-      const { data, error } = await resend.emails.send({
-        from: 'toBlog <hola@platanito.dev>',
-        to: input.email,
-        subject: 'Confirma tu correo electrónico - toBlog',
-        html: `
-          <h1>¡Bienvenido a toBlog!</h1>
-          <p>Haz clic en el siguiente enlace para confirmar tu cuenta y acceder:</p>
-          <a href="${verifyLink}" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:5px;">
-            Verificar mi correo
-          </a>
-          <p>Este enlace expirará en 15 minutos.</p>
-        `,
-      });
-
-      if (error) {
-        console.error("Resend Error:", error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: `Error al enviar correo: ${error.message}`,
-        });
+      if (resend) {
+        try {
+          const fromEmail = import.meta.env.RESEND_FROM_EMAIL || (typeof process !== 'undefined' ? process.env.RESEND_FROM_EMAIL : '') || 'toBlog <onboarding@resend.dev>';
+          await resend.emails.send({
+            from: fromEmail,
+            to: input.email,
+            subject: 'Confirma tu correo electrónico - toBlog',
+            html: `
+              <h1>¡Bienvenido a toBlog!</h1>
+              <p>Haz clic en el siguiente enlace para confirmar tu cuenta y acceder:</p>
+              <a href="${verifyLink}" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:5px;">
+                Verificar mi correo
+              </a>
+              <p>Este enlace expirará en 15 minutos.</p>
+            `,
+          });
+        } catch (err: any) {
+          console.error("Error al enviar email via Resend:", err);
+          // Si falla el envío de mail, no tumbamos el registro con un 500
+        }
       }
 
       return { success: true, email: input.email };
@@ -201,42 +203,29 @@ export const authActions = {
       // Borrar tokens previos del usuario para evitar ataques de replay o múltiples envíos válidos
       await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
 
-      const resend = new Resend(import.meta.env.API_RESEND);
-      const tokenId = nanoid();
-      const code = nanoid(32);
-      // Expira en 3 minutos exactos
-      const expiresAt = Math.floor(Date.now() / 1000) + 3 * 60;
+      const apiKey = import.meta.env.API_RESEND || (typeof process !== 'undefined' ? process.env.API_RESEND : '');
+      if (apiKey) {
+        try {
+          const resend = new Resend(apiKey);
+          const baseUrl = import.meta.env.PUBLIC_URL || (typeof process !== 'undefined' ? process.env.PUBLIC_URL : '') || 'http://localhost:4321';
+          const resetLink = `${baseUrl}/reset-password?token=${code}`;
+          const fromEmail = import.meta.env.RESEND_FROM_EMAIL || (typeof process !== 'undefined' ? process.env.RESEND_FROM_EMAIL : '') || 'toBlog <onboarding@resend.dev>';
 
-      await db.insert(passwordResetTokens).values({
-        id: tokenId,
-        userId: user.id,
-        code,
-        expiresAt,
-      });
-
-      const resetLink = `${import.meta.env.PUBLIC_URL || 'http://localhost:4321'}/reset-password?token=${code}`;
-
-      const { error } = await resend.emails.send({
-        from: 'toBlog <hola@platanito.dev>',
-        to: user.email, // Usamos el email real de la DB, no el input (por si el input fue username)
-        subject: 'Recuperación de contraseña - toBlog',
-        html: `
-          <h1>Solicitud de cambio de contraseña</h1>
-          <p>Hemos recibido una solicitud para cambiar tu contraseña.</p>
-          <a href="${resetLink}" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:5px;">
-            Restablecer contraseña
-          </a>
-          <p>Este enlace expirará en exactamente 3 minutos por motivos de seguridad.</p>
-          <p>Si no fuiste tú, puedes ignorar este mensaje.</p>
-        `,
-      });
-
-      if (error) {
-        console.error("Resend Error:", error);
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'Error al enviar el correo de recuperación.',
-        });
+          await resend.emails.send({
+            from: fromEmail,
+            to: user.email,
+            subject: 'Recuperación de contraseña - toBlog',
+            html: `
+              <h1>Solicitud de cambio de contraseña</h1>
+              <p>Hemos recibido una solicitud para cambiar tu contraseña.</p>
+              <a href="${resetLink}" style="display:inline-block;padding:10px 20px;background:#111827;color:#fff;text-decoration:none;border-radius:5px;">
+                Restablecer contraseña
+              </a>
+            `,
+          });
+        } catch (err: any) {
+          console.error("Error al enviar email de recuperación:", err);
+        }
       }
 
       return { success: true };
