@@ -16,7 +16,7 @@
 ### 1. Motor de Vistas Únicas (Unique View Tracking System)
 Para evitar la inflación artificial de métricas por recarga consecutiva de página ($F5$), el sistema implementa una verificación mediante cookies de servidor seguras con ventana deslizante de 24 horas:
 
-$$\text{Si } \text{Cookie}(\text{viewed\_post\_ID}) \notin \text{Request.Cookies} \implies \Delta \text{viewCount} = \text{viewCount} + 1$$
+$$\text{Cookie}(\text{viewed-post-id}) \notin \text{Request.Cookies} \implies \Delta \text{viewCount} = \text{viewCount} + 1$$
 
 * **Seguridad HTTP-Only:** Las cookies se emiten con la bandera `httpOnly: true`, haciéndolas inaccesibles para scripts maliciosos en el cliente (XSS).
 * **Incremento Atómico en SQL:** La actualización se ejecuta directamente en el motor de base de datos a través de una expresión atómica Drizzle `sql\`${posts.viewCount} + 1\``, garantizando consistencia ante peticiones concurrentes.
@@ -24,7 +24,7 @@ $$\text{Si } \text{Cookie}(\text{viewed\_post\_ID}) \notin \text{Request.Cookies
 ### 2. Algoritmo de Lecturas Únicas (Scroll & Time Engagement Observer)
 A diferencia de una simple vista, una **Lectura (Read)** mide la retención real del usuario. El sistema combina el monitoreo topológico del DOM con una restricción temporal mínima:
 
-$$\text{Lectura Válida} = (\text{Sentinel.Intersecting} == \text{true}) \land (t_{\text{permanencia}} \ge 10\,\text{segundos})$$
+$$\text{LecturaValida} = (\text{Sentinel.Intersecting} = \text{true}) \land (t_{\text{permanencia}} \ge 10\,\text{segundos})$$
 
 * **Centinela en DOM:** Se posiciona un elemento invisible (`#read-tracker-sentinel`) al final del contenido del artículo.
 * **IntersectionObserver API:** Un observador asíncrono rastrea cuando el usuario ha desplazado la pantalla hasta el final del escrito.
