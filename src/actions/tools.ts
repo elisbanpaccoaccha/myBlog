@@ -1,7 +1,5 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
-import pdfParse from 'pdf-parse';
-
 export const toolsActions = {
   parseDocument: defineAction({
     accept: 'form',
@@ -27,9 +25,9 @@ export const toolsActions = {
         if (file.type === 'application/pdf') {
           const arrayBuffer = await file.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
-          
+          const pdfParseModule = await import('pdf-parse');
+          const pdfParse = (pdfParseModule as any).default || pdfParseModule;
           const data = await pdfParse(buffer, { max: 10 }); 
-          
           if (!data.text || data.text.trim().length === 0) {
             throw new Error('El PDF parece estar vacío o ser solo imágenes (escaneado).');
           }

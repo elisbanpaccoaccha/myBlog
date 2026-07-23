@@ -20,7 +20,7 @@ export const r2 = new S3Client({
   },
 });
 
-export const R2_BUCKET  = getEnv('R2_BUCKET_NAME')  || 'toblog-media';
+export const R2_BUCKET  = getEnv('R2_BUCKET_NAME')  || 'myblog-media';
 export const R2_BASE_URL = getEnv('R2_PUBLIC_URL')  || '';
 
 /**
