@@ -13,6 +13,8 @@ interface Post {
   publishedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  viewCount?: number;
+  readCount?: number;
 }
 
 // const formatPostDate = (dateStr: string | null) => {
@@ -137,6 +139,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
 
   const publishedCount = posts.filter(p => p.status === 'PUBLISHED').length;
   const draftCount = posts.filter(p => p.status === 'DRAFT').length;
+  const totalViews = posts.reduce((sum, post) => sum + (post.viewCount || 0), 0);
 
   const filteredPosts = React.useMemo(() => {
     let result = [...posts];
@@ -229,7 +232,7 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
             <span className="text-[15px] font-medium text-gray-800">Vistas Totales</span>
             <svg className="text-gray-400" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </div>
-          <span className="text-4xl font-bold text-gray-900">0</span>
+          <span className="text-4xl font-bold text-gray-900">{totalViews}</span>
         </div>
       </div>
 
@@ -350,11 +353,11 @@ export default function DashboardList({ initialPosts }: DashboardProps) {
                       <div className="flex items-center justify-center gap-4 font-medium">
                         <div className="flex items-center gap-1.5" title="Vistas">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                          <span>0</span>
+                          <span>{post.viewCount || 0}</span>
                         </div>
                         <div className="flex items-center gap-1.5" title="Lecturas">
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                          <span>0</span>
+                          <span>{post.readCount || 0}</span>
                         </div>
                       </div>
                     </td>
