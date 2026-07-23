@@ -154,3 +154,6 @@ Thumbs.db
 *.code-workspace
 .history/
 vscode/
+
+# Scripts temporales / Scratch
+/scripts/
