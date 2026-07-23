@@ -50,7 +50,13 @@ export default function ShareButton({ title }: ShareButtonProps) {
         break;
     }
     
-    window.open(shareUrl, '_blank', 'width=600,height=400');
+    const width = 600;
+    const height = 400;
+    // Calcular el centro de la pantalla actual (soporta configuraciones de múltiples monitores)
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+    
+    window.open(shareUrl, '_blank', `width=${width},height=${height},left=${left},top=${top}`);
     setIsOpen(false);
   };
 
