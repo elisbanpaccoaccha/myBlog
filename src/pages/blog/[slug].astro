@@ -8,7 +8,7 @@ import Reader from '../../components/studio/Reader.tsx';
 import BookmarkButton from '../../components/blog/BookmarkButton.tsx';
 import CommentsSection from '../../components/blog/CommentsSection.tsx';
 import LikeButton from '../../components/blog/LikeButton.tsx';
-import ShareButton from '../../components/blog/ShareButton.tsx';
+import ShareButton from '../../components/blog/ShareButton';
 
 export const prerender = false;
 
@@ -54,6 +54,26 @@ if (rows.length === 0) {
 }
 
 const row  = rows[0]!;
+
+// Sistema de Vistas Únicas
+const viewCookieName = `viewed_${row.id}`;
+const hasViewed = Astro.cookies.has(viewCookieName);
+
+if (!hasViewed) {
+  // Incrementar el contador de vistas en la base de datos
+  await db.update(postsTable)
+    .set({ viewCount: sql`${postsTable.viewCount} + 1` })
+    .where(eq(postsTable.id, row.id));
+    
+  // Guardar la cookie en el navegador por 24 horas
+  Astro.cookies.set(viewCookieName, 'true', {
+    path: '/',
+    maxAge: 60 * 60 * 24, // 24 horas
+    httpOnly: true, // Invisible para Javascript del cliente (más seguro)
+    secure: import.meta.env.PROD, // Solo por HTTPS en producción
+    sameSite: 'lax',
+  });
+}
 
 // Filtro de privacidad: Si es borrador, solo el autor puede verlo
 if (row.status === 'DRAFT' && row.authorId !== currentUserId) {
@@ -121,7 +141,7 @@ if (currentUserId && post.id) {
 >
   <article class="article-layout">
 
-    <!-- ─── Cabecera del artículo (estilo Medium) ──────────────────────── -->
+    <!-- ─── Cabecera del artículo ──────────────────────── -->
     <header class="article-header">
       <h1 class="article-title">{post.title}</h1>
 
@@ -184,8 +204,66 @@ if (currentUserId && post.id) {
     <!-- ─── Sección de Comentarios ───────────────────────────────────── -->
     <CommentsSection client:load postId={post.id} commentCount={initialCommentCount} currentUserId={currentUserId} />
 
+    <!-- ─── Tracker de Lecturas ──────────────────────────────────────── -->
+    <div id="read-tracker-sentinel" data-post-id={post.id} style="height: 1px; width: 100%;"></div>
+
   </article>
 </BaseLayout>
+
+<script>
+  // Script para Trackear Lecturas (Reads)
+  document.addEventListener('DOMContentLoaded', () => {
+    const sentinel = document.getElementById('read-tracker-sentinel');
+    if (!sentinel) return;
+
+    const postId = sentinel.getAttribute('data-post-id');
+    const startTime = Date.now();
+    let hasBeenRead = false;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !hasBeenRead) {
+          const timeSpent = Date.now() - startTime;
+          // Si pasó más de 10 segundos leyendo y scrolleó hasta abajo
+          if (timeSpent >= 10000) {
+            hasBeenRead = true;
+            fetch('/api/posts/read', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ postId })
+            }).catch(console.error);
+            observer.disconnect();
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+
+    observer.observe(sentinel);
+
+    // En caso de que el usuario llegue abajo muy rápido, re-chequeamos al mover el mouse o hacer scroll
+    const checkLater = () => {
+      if (hasBeenRead) return;
+      const rect = sentinel.getBoundingClientRect();
+      const isVisible = (rect.top <= (window.innerHeight || document.documentElement.clientHeight));
+      const timeSpent = Date.now() - startTime;
+      
+      if (isVisible && timeSpent >= 10000) {
+        hasBeenRead = true;
+        fetch('/api/posts/read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ postId })
+        }).catch(console.error);
+        
+        window.removeEventListener('scroll', checkLater);
+        window.removeEventListener('mousemove', checkLater);
+      }
+    };
+
+    window.addEventListener('scroll', checkLater, { passive: true });
+    window.addEventListener('mousemove', checkLater, { passive: true });
+  });
+</script>
 
 <style>
   .article-layout {
