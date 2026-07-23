@@ -1,141 +1,214 @@
-# 🚀 myBlog: Astro + Turso + Drizzle + Lucia Auth + Tailwind CSS v4
+# 🚀 toBlog: Plataforma Editorial y Motor de Contenidos Estilo Medium
 
-Un motor de blog minimalista y potente de alto rendimiento desarrollado con **Astro 7** (modo SSR), **React 19**, **Tailwind CSS v4** y una arquitectura de base de datos moderna con **Turso** y **Drizzle ORM**. Cuenta con autenticación integrada mediante **Lucia Auth** y un panel de administración (Studio) con un editor WYSIWYG basado en **TipTap** con soporte de subida de imágenes a **Cloudflare R2**.
+[![Astro](https://img.shields.io/badge/Astro-v7.0%2B-FF5D01?logo=astro&logoColor=white)](https://astro.build/)
+[![React](https://img.shields.io/badge/React-v19.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Turso](https://img.shields.io/badge/Turso-LibSQL-4FF8D2?logo=sqlite&logoColor=black)](https://turso.tech/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind-v4.0-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
+
+**toBlog** es un motor de publicación editorial y plataforma de contenidos de alto rendimiento inspirado en el diseño y la experiencia de usuario de **Medium**. Está desarrollado sobre una arquitectura híbrida de **Astro 7 (SSR)** con **Islas de React 19**, utilizando una base de datos distribuida en el borde con **Turso (LibSQL)** y **Drizzle ORM**, autenticación segura con **Lucia Auth** y almacenamiento multimedia en **Cloudflare R2**.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🧠 Fundamentos Técnicos y Arquitectura
 
-- **Framework Principal:** [Astro 7](https://astro.build/) en modo servidor (SSR).
-- **Estilos:** [Tailwind CSS v4](https://tailwindcss.com/) (usando el plugin oficial de Vite) junto con CSS vainilla para diseño optimizado.
-- **Interactividad del Studio:** [React 19](https://react.dev/) y [SWR](https://swr.vercel.app/) para la gestión de estados y peticiones en el cliente.
-- **Base de Datos:** [Turso](https://turso.tech/) (LibSQL / SQLite).
-- **ORM:** [Drizzle ORM](https://orm.drizzle.team/) con Drizzle Kit para control de migraciones y esquemas.
-- **Autenticación:** [Lucia Auth v3](https://lucia-auth.com/) con adaptador de SQLite para gestión de sesiones seguras.
-- **Editor de Contenido:** [TipTap](https://tiptap.dev/) (Editor de texto enriquecido WYSIWYG) con almacenamiento de imágenes en **Cloudflare R2** (S3 compatible).
+### 1. Motor de Vistas Únicas (Unique View Tracking System)
+Para evitar la inflación artificial de métricas por recarga consecutiva de página ($F5$), el sistema implementa una verificación mediante cookies de servidor seguras con ventana deslizante de 24 horas:
+
+$$\text{Si } \text{Cookie}(\text{viewed\_post\_ID}) \notin \text{Request.Cookies} \implies \Delta \text{viewCount} = \text{viewCount} + 1$$
+
+* **Seguridad HTTP-Only:** Las cookies se emiten con la bandera `httpOnly: true`, haciéndolas inaccesibles para scripts maliciosos en el cliente (XSS).
+* **Incremento Atómico en SQL:** La actualización se ejecuta directamente en el motor de base de datos a través de una expresión atómica Drizzle `sql\`${posts.viewCount} + 1\``, garantizando consistencia ante peticiones concurrentes.
+
+### 2. Algoritmo de Lecturas Únicas (Scroll & Time Engagement Observer)
+A diferencia de una simple vista, una **Lectura (Read)** mide la retención real del usuario. El sistema combina el monitoreo topológico del DOM con una restricción temporal mínima:
+
+$$\text{Lectura Válida} = (\text{Sentinel.Intersecting} == \text{true}) \land (t_{\text{permanencia}} \ge 10\,\text{segundos})$$
+
+* **Centinela en DOM:** Se posiciona un elemento invisible (`#read-tracker-sentinel`) al final del contenido del artículo.
+* **IntersectionObserver API:** Un observador asíncrono rastrea cuando el usuario ha desplazado la pantalla hasta el final del escrito.
+* **Disparo Silencioso:** Cumplida la condición, el cliente envía un *beacon* vía `POST /api/posts/read` que registra la lectura única y emite una cookie de bloqueo por 24 horas.
+
+### 3. Sistema de Autenticación & Sesiones en el Borde
+* **Lucia Auth v3:** Gestión de sesiones persistentes basadas en cookies respaldadas por la base de datos Turso SQLite.
+* **Cifrado de Contraseñas:** Algoritmo **Argon2id** para el hashing seguro de credenciales de acceso.
+* **Flujo de Verificación Transaccional:** Generación de tokens de un solo uso de 15 minutos enviados mediante **Resend Email API**.
+
+### 4. Arquitectura Híbrida SSR + Islas Reactivas (React 19 + SWR)
+* **SSR Instantáneo (Server-Side Rendering):** El servidor procesa el HTML inicial incluyendo metadatos SEO y datos primarios del Dashboard.
+* **Revalidación SWR en Cliente:** La interfaz React del Studio utiliza la estrategia `Cache-First + Background Revalidation` con intervalos de deduplicación de 5000ms para mantener las métricas actualizadas sin parpadeos.
 
 ---
 
 ## 📂 Estructura del Proyecto
 
-El código fuente está estructurado de la siguiente forma:
+El repositorio está organizado de manera modular siguiendo las mejores prácticas de Astro y React:
 
-- **[db/](./db/)**: Scripts de base de datos extra-aplicación (por ejemplo, el script de inicialización [seed.ts](./db/seed.ts)).
-- **[src/](./src/)**: Carpeta principal del código fuente.
-  - **[actions/](./src/actions/)**: Acciones seguras ejecutadas en el servidor (Astro Actions) para autenticación ([auth.ts](./src/actions/auth.ts)) y gestión de publicaciones ([posts.ts](./src/actions/posts.ts)).
-  - **[components/](./src/components/)**:
-    - **studio/**: Componentes interactivos en React (`DashboardList`, `EditorWYSIWYG`, `TagSelector`) para el panel de administración.
-    - **ui/**: Componentes visuales reutilizables de Astro (como [PostCard.astro](./src/components/ui/PostCard.astro)).
-  - **[db/](./src/db/)**: Configuración del cliente Drizzle ([client.ts](./src/db/client.ts)) y definición del esquema ([schema.ts](./src/db/schema.ts)).
-  - **[layouts/](./src/layouts/)**: Diseños base del sitio público ([BaseLayout.astro](./src/layouts/BaseLayout.astro)) y del panel de administración ([StudioLayout.astro](./src/layouts/StudioLayout.astro)).
-  - **[lib/](./src/lib/)**: Configuraciones de clientes e inicializaciones externas, como Lucia Auth ([lucia.ts](./src/lib/lucia.ts)) y Cloudflare R2 ([r2.ts](./src/lib/r2.ts)).
-  - **[pages/](./src/pages/)**: Sistema de rutas del proyecto:
-    - `index.astro`: Página de inicio (Inicio). Muestra un Hero y los 3 últimos artículos.
-    - `login.astro`: Vista del formulario de acceso.
-    - `blog/`: Sección pública con el feed de publicaciones (`index.astro`) y las páginas de artículos dinámicas (`[slug].astro`).
-    - `studio/`: Panel del autor. `index.astro` para el listado de posts y `escribir.astro` para crear/editar.
-    - `api/`: Rutas API de servidor (Cierre de sesión `/api/auth/logout` y receptor de subidas de archivos `/api/upload`).
-  - **[styles/](./src/styles/)**: Contiene [global.css](./src/styles/global.css) que importa Tailwind y establece las variables CSS del sitio.
+```text
+toBlog/
+├── db/                                  # Scripts extra-aplicación
+│   └── seed.ts                          # Script de alimentación inicial de la BD (Admin + Posts)
+├── public/                              # Recursos estáticos globales (Favicon, imágenes estáticas)
+├── scripts/                             # Scripts de utilidades e inspección técnica (Ignorado en Git)
+├── src/                                 # Código fuente de la aplicación
+│   ├── actions/                         # Acciones de servidor (Astro Actions)
+│   │   ├── auth.ts                      # Lógica de registro, inicio de sesión y verificación de email
+│   │   ├── index.ts                     # Exportador global de servidor
+│   │   ├── interactions.ts              # Lógica de likes (aplausos) y marcadores (bookmarks)
+│   │   ├── posts.ts                     # CRUD de artículos, duplicación y consulta de métricas
+│   │   ├── profile.ts                   # Actualización de perfil del autor
+│   │   └── tools.ts                     # Herramientas auxiliares
+│   ├── components/                      # Componentes UI (Astro & React)
+│   │   ├── blog/                        # Componentes interactivos del artículo público
+│   │   │   ├── BookmarkButton.tsx       # Botón interactivo de guardado
+│   │   │   ├── CommentsSection.tsx      # Sección de comentarios e hilos de discusión
+│   │   │   ├── LikeButton.tsx           # Botón de aplausos acumulativos
+│   │   │   └── ShareButton.tsx          # Popover de compartir con centrado matemático
+│   │   ├── common/                      # Componentes comunes de interfaz
+│   │   │   └── Header.astro             # Barra de navegación principal pública
+│   │   ├── editor/                      # Componentes del editor enriquecido
+│   │   │   ├── EditorWYSIWYG.tsx        # Editor TipTap interactivo con subida a R2
+│   │   │   └── Reader.tsx               # Renderizador HTML seguro de contenidos
+│   │   ├── studio/                      # Componentes del panel de control
+│   │   │   ├── DashboardList.tsx        # Tabla elástica de artículos y resumen de métricas
+│   │   │   ├── TagSelector.tsx          # Selector dinámico de etiquetas
+│   │   │   └── UserProfileDropdown.tsx  # Menú desplegable de usuario autenticado
+│   │   └── ui/                          # Tarjetas y componentes visuales reutilizables
+│   │       └── PostCard.astro           # Tarjeta de artículo para feeds
+│   ├── db/                              # Capa de base de datos
+│   │   ├── client.ts                    # Inicializador del cliente Turso / LibSQL
+│   │   └── schema.ts                    # Esquema Drizzle (Users, Sessions, Posts, Bookmarks, Likes, Tags)
+│   ├── layouts/                         # Estructuras base de diseño HTML
+│   │   ├── BaseLayout.astro             # Layout del sitio público (Header + Footer + SEO)
+│   │   └── StudioLayout.astro           # Layout del panel de administración (Studio)
+│   ├── lib/                             # Clientes e integraciones externas
+│   │   ├── aiConfig.ts                  # Configuración de herramientas asistidas
+│   │   ├── lucia.ts                     # Instancia y adaptador de Lucia Auth v3
+│   │   └── r2.ts                        # Cliente AWS S3 para Cloudflare R2
+│   ├── pages/                           # Enrutamiento de la aplicación (SSR)
+│   │   ├── api/                         # Endpoints API de servidor
+│   │   │   ├── auth/                    # Endpoints de sesión (/logout, /verify-email)
+│   │   │   ├── posts/                   # Endpoints de interacción (/read)
+│   │   │   └── upload.ts                # Receptor y procesador de imágenes hacia R2
+│   │   ├── blog/                        # Rutas de la sección del blog
+│   │   │   ├── index.astro              # Feed principal de publicaciones
+│   │   │   └── [slug].astro             # Vista detallada del artículo (Tracking de Vistas/Lecturas)
+│   │   ├── studio/                      # Rutas del panel de administración
+│   │   │   ├── index.astro              # Dashboard principal con conteo de métricas
+│   │   │   └── escribir.astro           # Creación y edición de artículos
+│   │   ├── biblioteca.astro             # Vista unificada de artículos guardados por el usuario
+│   │   ├── index.astro                  # Página de aterrizaje / Inicio público
+│   │   ├── login.astro                  # Formulario de inicio de sesión
+│   │   ├── register.astro               # Formulario de registro de usuarios
+│   │   └── verify-notice.astro          # Pantalla de aviso de verificación de correo
+│   └── styles/                          # Estilos globales
+│       └── global.css                   # Importación de Tailwind CSS v4 y tokens de diseño
+├── .env.example                         # Plantilla de variables de entorno requeridas
+├── astro.config.mjs                     # Configuración principal de Astro (Integraciones React + Tailwind)
+├── drizzle.config.ts                    # Configuración de Drizzle Kit para migraciones
+├── package.json                         # Definición de dependencias y scripts del proyecto
+└── README.md                            # Documentación del proyecto
+```
 
 ---
 
-## ⚙️ Configuración e Instalación
+## ⚙️ Requisitos del Sistema
 
-### 1. Requisitos Previos
+* **Node.js**: Versión `>= 22.12.0`
+* **Gestor de Paquetes**: `pnpm` (recomendado) o `npm` / `yarn`
+* **Base de Datos**: Cuenta activa en [Turso](https://turso.tech/) (o SQLite local)
+* **Almacenamiento de Archivos**: Bucket en [Cloudflare R2](https://www.cloudflare.com/products/r2/) (Compatible con S3)
+* **Proveedor de Emails**: Cuenta en [Resend](https://resend.com/)
 
-Asegúrate de contar con Node.js (versión `>= 22.12.0`) y `pnpm` instalado de forma global.
+---
 
-### 2. Instalar Dependencias
+## 🚀 Guía de Ejecución
 
-Clona el proyecto e instala los paquetes necesarios usando `pnpm`:
+### 1. Clonar el Repositorio e Instalar Dependencias
 
-```sh
+```bash
+git clone https://github.com/elisbanpaco/myBlog.git
+cd myBlog
 pnpm install
 ```
 
-### 3. Variables de Entorno
+### 2. Configurar Variables de Entorno
 
-Copia el archivo de ejemplo para crear tu configuración local:
+Copia el archivo `.env.example` para generar tu configuración local `.env`:
 
-```sh
+```bash
 cp .env.example .env
 ```
 
-Edita el archivo `.env` configurando tus credenciales de **Turso** y **Cloudflare R2**:
+Configura tus credenciales en el archivo `.env`:
 
 ```ini
-# Base de datos Turso
+# Base de datos Turso (LibSQL)
 TURSO_DATABASE_URL=libsql://<tu-base-de-datos>.turso.io
 TURSO_AUTH_TOKEN=<tu-token-de-acceso>
 
-# Cloudflare R2 / S3
+# Cloudflare R2 / Almacenamiento S3
 R2_ENDPOINT=https://<account_id>.r2.cloudflarestorage.com
 R2_ACCESS_KEY_ID=<tu-access-key-id>
 R2_SECRET_ACCESS_KEY=<tu-secret-access-key>
-R2_BUCKET_NAME=myblog-media
-R2_PUBLIC_URL=https://<tu-bucket>.r2.dev
+R2_BUCKET_NAME=toblog-media
+R2_PUBLIC_URL=https://<tu-bucket-publico>.r2.dev
+
+# Envíos de correo transaccionales con Resend
+API_RESEND=re_<tu_api_key>
 ```
 
-### 4. Configurar la Base de Datos Local
+### 3. Inicializar la Base de Datos Local
 
-Puedes levantar una base de datos local SQLite utilizando Drizzle Kit (se guardará por defecto en `.astro/content.db`):
+Puedes levantar una base de datos local SQLite utilizando Drizzle Kit (se guardará en `.astro/content.db`):
 
-```sh
+```bash
 # Crear las tablas en la base de datos local
 pnpm db:push:local
 
-# Alimentar la base de datos con el usuario admin y posts de prueba
+# Insertar el usuario administrador y artículos de prueba iniciales
 pnpm db:seed:local
 ```
 
-### 5. Iniciar el Servidor de Desarrollo
+### 4. Iniciar el Servidor de Desarrollo
 
-Ejecuta el comando para arrancar la aplicación de manera local:
-
-```sh
+```bash
 pnpm dev
 ```
 
-> **Nota:** Según las directrices de desarrollo del proyecto, para ejecutar el servidor en segundo plano puedes usar `astro dev --background` y administrarlo mediante `astro dev stop`, `astro dev status` y `astro dev logs`.
+El servidor estará disponible en [http://localhost:4321](http://localhost:4321).
 
-El sitio estará disponible por defecto en [http://localhost:4321](http://localhost:4321).
-
----
-
-## 🔑 Credenciales de Acceso (Por Defecto)
-
-Tras ejecutar el script de seed (`pnpm db:seed:local`), se crea una cuenta de administrador para acceder al panel de control `/studio`:
-
-- **Usuario:** `admin`
-- **Contraseña:** `admin1234`
-
-Puedes iniciar sesión en [http://localhost:4321/login](http://localhost:4321/login) para administrar las publicaciones.
+> **Nota para desarrollo:** Para ejecutar el servidor en segundo plano puedes usar `astro dev --background` y gestionarlo mediante `astro dev status` y `astro dev logs`.
 
 ---
 
-## 🧞 Comandos Disponibles
+## 🔑 Credenciales de Prueba (Entorno Local)
 
-| Comando | Acción |
+Tras ejecutar el comando `pnpm db:seed:local`, podrás acceder al panel `/studio` con el usuario por defecto:
+
+* **Usuario:** `admin`
+* **Contraseña:** `admin1234`
+
+---
+
+## 📊 Tabla de Comandos Disponibles
+
+| Comando | Descripción |
 | :--- | :--- |
 | `pnpm dev` | Inicia el servidor de desarrollo local de Astro. |
 | `pnpm build` | Compila la aplicación optimizada para producción en `./dist/`. |
-| `pnpm preview` | Previsualiza localmente la compilación de producción. |
+| `pnpm preview` | Previsualiza la compilación de producción en entorno local. |
 | `pnpm lint` | Analiza el código en busca de problemas de formato con ESLint. |
-| `pnpm lint:fix` | Corrige de forma automática los problemas detectados por ESLint. |
-| `pnpm db:push:local` | Sincroniza el esquema Drizzle directamente con la base de datos local. |
-| `pnpm db:push:remote` | Sincroniza el esquema Drizzle con la base de datos remota de Turso. |
-| `pnpm db:seed:local` | Alimenta la base de datos local con datos iniciales (Admin y Post de prueba). |
-| `pnpm db:seed:remote` | Alimenta la base de datos remota de Turso con datos iniciales. |
-| `pnpm db:studio` | Abre la interfaz web Drizzle Studio para administrar los datos de la base de datos. |
+| `pnpm lint:fix` | Corrige automáticamente los errores detectados por ESLint. |
+| `pnpm db:push:local` | Sincroniza el esquema Drizzle con la base de datos local. |
+| `pnpm db:push:remote` | Sincroniza el esquema Drizzle con la BD remota de Turso. |
+| `pnpm db:seed:local` | Puebla la base de datos local con datos de prueba. |
+| `pnpm db:seed:remote` | Puebla la BD remota de Turso con datos iniciales. |
+| `pnpm db:studio` | Abre la consola web **Drizzle Studio** para inspeccionar las tablas. |
 
 ---
 
-## 🚀 Despliegue en Producción
+## 📄 Licencia
 
-Dado que el proyecto utiliza el modo de salida en servidor (`output: 'server'`), para el despliegue a producción en plataformas como Cloudflare, Vercel, Netlify o un servidor Node VPS, es necesario añadir el adaptador correspondiente de Astro en el archivo [astro.config.mjs](./astro.config.mjs).
-
-Por ejemplo, para desplegar en Node:
-
-1. Añadir el adaptador: `pnpm astro add node`
-2. El archivo de configuración importará y declarará `adapter: node({ mode: 'standalone' })`.
-3. Ejecutar `pnpm build` y correr el servidor de producción generado.
+Este proyecto está distribuido bajo la Licencia **MIT**. Consulta el archivo [LICENSE](./LICENSE) para más información.
