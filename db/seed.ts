@@ -32,6 +32,8 @@ async function main() {
   await db.insert(schema.users).values({
     id:            'user-admin-001',
     username:      'admin',
+    email:         'admin@myblog.com',
+    emailVerified: 1,
     password_hash: adminPasswordHash,
     role:          'ADMIN',
   });
