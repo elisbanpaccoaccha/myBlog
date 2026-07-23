@@ -44,9 +44,10 @@ export const authActions = {
       path: ['confirmPassword'],
     }),
     handler: async (input) => {
-      const apiKey = import.meta.env.API_RESEND || (typeof process !== 'undefined' ? process.env.API_RESEND : '');
-      const resend = apiKey ? new Resend(apiKey) : null;
-      // Verificar si existe el usuario o email
+      try {
+        const apiKey = import.meta.env.API_RESEND || (typeof process !== 'undefined' ? process.env.API_RESEND : '');
+        const resend = apiKey ? new Resend(apiKey) : null;
+        // Verificar si existe el usuario o email
       const existingUser = await db
         .select({ id: users.id, username: users.username, email: users.email })
         .from(users)
@@ -119,7 +120,15 @@ export const authActions = {
         }
       }
 
-      return { success: true, email: input.email };
+        return { success: true, email: input.email };
+      } catch (err: any) {
+        console.error("REGISTER ERROR:", err);
+        if (err instanceof ActionError) throw err;
+        throw new ActionError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: err.message || 'Error al procesar el registro.',
+        });
+      }
     }
   }),
 

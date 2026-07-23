@@ -9,8 +9,13 @@ const getEnv = (key: string) => {
   return (import.meta.env as Record<string, any>)[key];
 };
 
-const url = getEnv('TURSO_DATABASE_URL') || 'file:.astro/content.db';
-const authToken = getEnv('TURSO_AUTH_TOKEN');
+let rawUrl = (getEnv('TURSO_DATABASE_URL') || 'file:.astro/content.db').trim();
+const authToken = getEnv('TURSO_AUTH_TOKEN')?.trim();
 
-export const libsqlClient = createClient({ url, authToken });
+// En entornos Serverless (Netlify Functions), convertir libsql:// a https:// fuerza el uso de HTTP fetch en lugar de WebSockets.
+if (rawUrl.startsWith('libsql://')) {
+  rawUrl = rawUrl.replace('libsql://', 'https://');
+}
+
+export const libsqlClient = createClient({ url: rawUrl, authToken });
 export const db = drizzle(libsqlClient, { schema });
