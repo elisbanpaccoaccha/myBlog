@@ -44,6 +44,8 @@ export const posts = sqliteTable('Posts', {
   published: integer('published').default(0).notNull(),
   status: text('status').default('DRAFT').notNull(),
   readingTime: integer('readingTime').default(1).notNull(),
+  viewCount: integer('viewCount').default(0).notNull(),
+  readCount: integer('readCount').default(0).notNull(),
   publishedAt: text('publishedAt'),
   createdAt: text('createdAt').notNull(),
   updatedAt: text('updatedAt').notNull(),
