@@ -19,6 +19,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@astrojs/netlify": "^8.1.2",
     "@astrojs/react": "^6.0.1",
     "@aws-sdk/client-s3": "^3.1075.0",
     "@libsql/client": "^0.17.4",
@@ -46,6 +47,7 @@
     "@tiptap/react": "^3.27.1",
     "@tiptap/starter-kit": "^3.27.1",
     "astro": "^7.1.1",
+    "cheerio": "^1.2.0",
     "drizzle-orm": "^0.45.2",
     "highlight.js": "^11.11.1",
     "lowlight": "^3.3.0",

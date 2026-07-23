@@ -1,10 +1,12 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
+import netlify from '@astrojs/netlify';
 import tailwind from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  adapter: netlify(),
   integrations: [
     react()
   ],
@@ -14,5 +16,4 @@ export default defineConfig({
       noExternal: ['react-tweet']
     }
   }
-  // adapter: node() or cloudflare() based on deployment target
 });
