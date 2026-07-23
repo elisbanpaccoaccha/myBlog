@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { actions } from 'astro:actions';
+import AuthModal from './AuthModal';
 
 interface Comment {
   id: string;
@@ -41,6 +42,7 @@ export default function CommentsSection({ postId, commentCount: initialCount, cu
   const [showAll, setShowAll] = useState(false);
   const [expandedThreads, setExpandedThreads] = useState<Record<string, boolean>>({});
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState<{ isOpen: boolean, title: string }>({ isOpen: false, title: '' });
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -68,9 +70,9 @@ export default function CommentsSection({ postId, commentCount: initialCount, cu
     
     if (error) {
       if (error.code === 'UNAUTHORIZED') {
-        alert('Debes iniciar sesión para comentar.');
+        setShowAuthModal({ isOpen: true, title: 'Únete para comentar' });
       } else {
-        alert('Error al enviar el comentario.');
+        showToast('Error al enviar el comentario.');
       }
       return false;
     } else if (data) {
@@ -118,7 +120,7 @@ export default function CommentsSection({ postId, commentCount: initialCount, cu
         return c;
       }));
       if (error.code === 'UNAUTHORIZED') {
-        alert('Debes iniciar sesión para dar like.');
+        setShowAuthModal({ isOpen: true, title: 'Únete para dar Me gusta' });
       }
     } else if (data) {
       setComments(prev => prev.map(c => {
@@ -434,6 +436,12 @@ export default function CommentsSection({ postId, commentCount: initialCount, cu
           </div>
         </div>
       )}
+      
+      <AuthModal 
+        isOpen={showAuthModal.isOpen} 
+        onClose={() => setShowAuthModal({ ...showAuthModal, isOpen: false })} 
+        title={showAuthModal.title}
+      />
     </section>
   );
 }
