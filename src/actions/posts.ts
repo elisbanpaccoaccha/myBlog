@@ -203,6 +203,8 @@ export const postActions = {
           publishedAt: posts.publishedAt,
           createdAt: posts.createdAt,
           updatedAt: posts.updatedAt,
+          viewCount: posts.viewCount,
+          readCount: posts.readCount,
         })
         .from(posts)
         .where(eq(posts.authorId, user.id))
@@ -219,6 +221,8 @@ export const postActions = {
         publishedAt: row.publishedAt,
         createdAt:   row.createdAt,
         updatedAt:   row.updatedAt,
+        viewCount:   row.viewCount,
+        readCount:   row.readCount,
       }));
       // console.log("SERVER getPosts output:", JSON.stringify(mapped, null, 2));
       return mapped;
