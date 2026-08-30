@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Términos de Servicio">
+  <div class="legal-page">
+    <div class="legal-page__inner">
+      <h1 class="legal-page__title">Términos de Servicio</h1>
+      <p class="legal-page__last-updated">Última actualización: {new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      
+      <div class="legal-page__content">
+        <p>
+          Bienvenido a <strong>toBlog</strong>. Al acceder o utilizar nuestro sitio web, aceptas estar sujeto a los siguientes Términos de Servicio. Si no estás de acuerdo con alguna parte de estos términos, no debes utilizar nuestra plataforma.
+        </p>
+
+        <h2>1. Uso de la plataforma</h2>
+        <p>
+          <strong>toBlog</strong> es un espacio diseñado para leer, publicar y compartir artículos. Te comprometes a utilizar nuestra plataforma únicamente con fines legales y de una manera que no infrinja los derechos de, ni restrinja o inhiba el uso y disfrute de esta plataforma por parte de cualquier tercero.
+        </p>
+
+        <h2>2. Cuentas de usuario</h2>
+        <p>
+          Para acceder a ciertas funciones (como publicar o guardar artículos), es posible que debas registrar una cuenta. Eres responsable de salvaguardar la contraseña que utilizas para acceder al servicio y de cualquier actividad o acción bajo tu contraseña.
+        </p>
+        <p>
+          Nos reservamos el derecho de suspender o cancelar cuentas que violen estos términos o que participen en comportamientos abusivos, spam o publicación de contenido inapropiado.
+        </p>
+
+        <h2>3. Propiedad intelectual</h2>
+        <p>
+          El contenido publicado por los usuarios sigue siendo propiedad de sus respectivos autores. Al publicar contenido en <strong>toBlog</strong>, nos otorgas una licencia mundial, no exclusiva y libre de regalías para usar, reproducir y mostrar dicho contenido en conexión con el servicio.
+        </p>
+        <p>
+          El diseño, código fuente, logotipos y marca de <strong>toBlog</strong> son propiedad exclusiva de la plataforma y no pueden ser utilizados sin nuestro permiso explícito por escrito.
+        </p>
+
+        <h2>4. Limitación de responsabilidad</h2>
+        <p>
+          <strong>toBlog</strong> se proporciona "tal cual" y "según disponibilidad". No ofrecemos garantías de ningún tipo, expresas o implícitas, sobre la exactitud, confiabilidad o disponibilidad del sitio web. En ningún caso seremos responsables de daños directos, indirectos, incidentales o consecuentes que resulten del uso o la imposibilidad de usar nuestro servicio.
+        </p>
+
+        <h2>5. Modificaciones de los Términos</h2>
+        <p>
+          Nos reservamos el derecho de modificar o reemplazar estos Términos en cualquier momento. Los cambios significativos serán notificados en esta misma página. El uso continuado de la plataforma después de cualquier cambio constituye tu aceptación de los nuevos Términos.
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page {
+    padding: 3.5rem 1.5rem;
+    background: #ffffff;
+  }
+  .legal-page__inner {
+    max-width: 728px;
+    margin: 0 auto;
+  }
+  .legal-page__title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  .legal-page__last-updated {
+    font-size: 0.95rem;
+    color: #6b6b6b;
+    margin-bottom: 3rem;
+  }
+  .legal-page__content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #333333;
+  }
+  .legal-page__content h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .legal-page__content p {
+    margin-bottom: 1.25rem;
+  }
+  .legal-page__content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .legal-page__content li {
+    margin-bottom: 0.5rem;
+  }
+  .legal-page__content strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+</style>

@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Política de Privacidad">
+  <div class="legal-page">
+    <div class="legal-page__inner">
+      <h1 class="legal-page__title">Política de Privacidad</h1>
+      <p class="legal-page__last-updated">Última actualización: {new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      
+      <div class="legal-page__content">
+        <p>
+          En <strong>toBlog</strong>, valoramos y respetamos tu privacidad. Esta Política de Privacidad explica cómo recopilamos, utilizamos y protegemos tu información personal cuando utilizas nuestro sitio web y nuestros servicios.
+        </p>
+
+        <h2>1. Información que recopilamos</h2>
+        <p>
+          Recopilamos la información que nos proporcionas directamente, como cuando creas una cuenta, te suscribes a nuestro boletín o te comunicas con nosotros. Esto puede incluir:
+        </p>
+        <ul>
+          <li><strong>Información de la cuenta:</strong> Nombre de usuario, dirección de correo electrónico y contraseña (cifrada).</li>
+          <li><strong>Datos de uso:</strong> Información sobre cómo interactúas con nuestra plataforma (páginas visitadas, tiempo de lectura, etc.).</li>
+        </ul>
+
+        <h2>2. Cómo utilizamos tu información</h2>
+        <p>
+          Utilizamos la información recopilada para:
+        </p>
+        <ul>
+          <li>Proveer, mantener y mejorar nuestros servicios.</li>
+          <li>Autenticar tu identidad y proteger tu cuenta.</li>
+          <li>Enviarte notificaciones importantes (como restablecimientos de contraseña) y, si lo aceptas, correos electrónicos con novedades.</li>
+        </ul>
+
+        <h2>3. Cookies y tecnologías similares</h2>
+        <p>
+          Utilizamos cookies esenciales para mantener tu sesión activa (por ejemplo, mediante <em>Lucia Auth</em>) y garantizar la seguridad de tu cuenta. No utilizamos cookies de rastreo intrusivas de terceros sin tu consentimiento.
+        </p>
+
+        <h2>4. Seguridad de los datos</h2>
+        <p>
+          Implementamos medidas de seguridad estándar de la industria para proteger tu información. Las contraseñas se almacenan mediante algoritmos de hash seguros (como Scrypt), asegurando que ni siquiera nosotros tengamos acceso a tu contraseña real.
+        </p>
+
+        <h2>5. Tus derechos</h2>
+        <p>
+          Tienes derecho a acceder, actualizar o eliminar tu información personal en cualquier momento. Si deseas ejercer estos derechos o tienes preguntas sobre tus datos, puedes ponerte en contacto con nosotros.
+        </p>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .legal-page {
+    padding: 3.5rem 1.5rem;
+    background: #ffffff;
+  }
+  .legal-page__inner {
+    max-width: 728px;
+    margin: 0 auto;
+  }
+  .legal-page__title {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+  }
+  .legal-page__last-updated {
+    font-size: 0.95rem;
+    color: #6b6b6b;
+    margin-bottom: 3rem;
+  }
+  .legal-page__content {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #333333;
+  }
+  .legal-page__content h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+  .legal-page__content p {
+    margin-bottom: 1.25rem;
+  }
+  .legal-page__content ul {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .legal-page__content li {
+    margin-bottom: 0.5rem;
+  }
+  .legal-page__content strong {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+</style>
