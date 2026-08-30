@@ -212,6 +212,19 @@ export const authActions = {
       // Borrar tokens previos del usuario para evitar ataques de replay o múltiples envíos válidos
       await db.delete(passwordResetTokens).where(eq(passwordResetTokens.userId, user.id));
 
+      // Generar token para reseteo de contraseña
+      const tokenId = nanoid();
+      const code = nanoid(32);
+      // Expira en 15 minutos
+      const expiresAt = Math.floor(Date.now() / 1000) + 15 * 60;
+
+      await db.insert(passwordResetTokens).values({
+        id: tokenId,
+        userId: user.id,
+        code,
+        expiresAt,
+      });
+
       const apiKey = import.meta.env.API_RESEND || (typeof process !== 'undefined' ? process.env.API_RESEND : '');
       if (apiKey) {
         try {
