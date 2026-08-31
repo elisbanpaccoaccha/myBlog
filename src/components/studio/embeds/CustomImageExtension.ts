@@ -17,3 +17,4 @@ export const CustomImage = Image.extend({
     return ReactNodeViewRenderer(ImageNodeView);
   },
 });
+

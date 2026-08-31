@@ -74,11 +74,14 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
     };
   }, [isFloatingMenuOpen]);
 
+  const uploadImageRef = useRef<(file: File) => Promise<void>>(() => Promise.resolve());
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
         horizontalRule: false,
+        link: false,
       }),
       CodeBlockLowlight.extend({
         addNodeView() {
@@ -97,6 +100,47 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
         nocookie: true,
       }),
     ],
+    editorProps: {
+      handlePaste(_view, event) {
+        const items = event.clipboardData?.items;
+        if (!items) return false;
+
+        const imageFiles: File[] = [];
+        for (let i = 0; i < items.length; i++) {
+          const item = items[i];
+          if (item.type.startsWith('image/')) {
+            const file = item.getAsFile();
+            if (file) {
+              imageFiles.push(file);
+            }
+          }
+        }
+
+        if (imageFiles.length > 0) {
+          event.preventDefault();
+          for (const file of imageFiles) {
+            uploadImageRef.current(file);
+          }
+          return true;
+        }
+
+        return false;
+      },
+      handleDrop(_view, event, _slice, moved) {
+        if (moved) return false;
+        const files = Array.from(event.dataTransfer?.files || []).filter(f =>
+          f.type.startsWith('image/'),
+        );
+        if (files.length > 0) {
+          event.preventDefault();
+          for (const file of files) {
+            uploadImageRef.current(file);
+          }
+          return true;
+        }
+        return false;
+      },
+    },
     content: initialContent ? JSON.parse(initialContent) : {
       type: 'doc',
       content: [{ type: 'paragraph' }],
@@ -118,27 +162,35 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
     }
   });
 
+  // ─── Subida de imagen (Drag & Drop, Paste y Botón) ───────────────────────────
+  const uploadImage = useCallback(async (file: File) => {
+    const activeEditor = editorRef?.current || editor;
+    if (!activeEditor) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Upload fallido');
+      }
+      const { url } = (await res.json()) as { url: string };
+      (activeEditor.chain().focus() as any).setImage({ src: url, alt: file.name }).run();
+    } catch (err) {
+      console.error('[EditorWYSIWYG] Upload error:', err);
+    }
+  }, [editor, editorRef]);
+
+  useEffect(() => {
+    uploadImageRef.current = uploadImage;
+  }, [uploadImage]);
+
   // ─── Expose editor instance via ref for AI integration ──────────────────────
   React.useEffect(() => {
     if (editorRef && editor) {
       editorRef.current = editor;
     }
   }, [editor, editorRef]);
-
-  // ─── Subida de imagen (Drag & Drop y Botón) ───────────────────────────
-  const uploadImage = async (file: File) => {
-    if (!editor) return;
-    const formData = new FormData();
-    formData.append('file', file);
-    try {
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (!res.ok) throw new Error('Upload fallido');
-      const { url } = (await res.json()) as { url: string };
-      (editor.chain().focus() as any).setCustomImage({ src: url, alt: file.name }).run();
-    } catch (err) {
-      console.error('[EditorWYSIWYG] Upload error:', err);
-    }
-  };
 
   const handleDrop = useCallback(
     async (event: React.DragEvent<HTMLDivElement>) => {
@@ -154,7 +206,7 @@ export default function EditorWYSIWYG({ initialContent = '', onContentChange, on
         await uploadImage(file);
       }
     },
-    [editor],
+    [editor, uploadImage],
   );
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {

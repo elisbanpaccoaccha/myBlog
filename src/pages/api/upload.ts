@@ -57,8 +57,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-  } catch (err) {
+  } catch (err: any) {
     console.error('[upload] Error en R2:', err);
-    return new Response(JSON.stringify({ error: 'Error al subir el archivo' }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: err?.message || 'Error al subir el archivo' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
+    );
   }
 };
