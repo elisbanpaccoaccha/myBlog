@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { NodeViewWrapper } from '@tiptap/react';
 import { GripVertical } from 'lucide-react';
 
-export default function BookmarkEmbedComponent({ node, updateAttributes }: any) {
+export default function BookmarkEmbedComponent({ node, updateAttributes, editor }: any) {
+  const isEditable = editor?.isEditable ?? false;
   const { url, title, description, image, domain, isLoaded } = node.attrs;
   const [loading, setLoading] = useState(!isLoaded);
 
@@ -30,9 +31,11 @@ export default function BookmarkEmbedComponent({ node, updateAttributes }: any) 
 
   return (
     <NodeViewWrapper className="bookmark-embed my-6 w-full relative group" contentEditable={false}>
-      <div data-drag-handle className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-600 p-1 z-10">
-        <GripVertical size={20} />
-      </div>
+      {isEditable && (
+        <div data-drag-handle className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-600 p-1 z-10">
+          <GripVertical size={20} />
+        </div>
+      )}
       {loading ? (
         <div className="border border-slate-200 rounded-md p-4 animate-pulse bg-white">
           <div className="h-4 bg-slate-200 rounded w-3/4 mb-4"></div>
